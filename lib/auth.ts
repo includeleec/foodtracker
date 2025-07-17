@@ -137,24 +137,24 @@ export class AuthService {
   /**
    * 监听认证状态变化
    */
-  static onAuthStateChange(callback: (user: User | null) => void) {
+  static onAuthStateChange(callback: (user: User | null, session?: any) => void) {
     return supabase.auth.onAuthStateChange((event, session) => {
       // 处理不同的认证事件
       switch (event) {
         case 'SIGNED_IN':
-          callback(session?.user ?? null)
+          callback(session?.user ?? null, session)
           break
         case 'SIGNED_OUT':
-          callback(null)
+          callback(null, null)
           break
         case 'TOKEN_REFRESHED':
-          callback(session?.user ?? null)
+          callback(session?.user ?? null, session)
           break
         case 'USER_UPDATED':
-          callback(session?.user ?? null)
+          callback(session?.user ?? null, session)
           break
         default:
-          callback(session?.user ?? null)
+          callback(session?.user ?? null, session)
       }
     })
   }

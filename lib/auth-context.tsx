@@ -1,11 +1,15 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
+import { User, Session } from '@supabase/supabase-js'
 import { AuthService } from './auth'
 
+interface AuthUser extends User {
+  access_token: string
+}
+
 interface AuthContextType {
-  user: User | null
+  user: AuthUser | null
   loading: boolean
   signOut: () => Promise<void>
 }
@@ -13,27 +17,39 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 获取初始用户状态
-    const getInitialUser = async () => {
+    // 获取初始用户状态和会话
+    const getInitialSession = async () => {
       try {
-        const currentUser = await AuthService.getCurrentUser()
-        setUser(currentUser)
+        const session = await AuthService.getSession()
+        if (session?.user && session?.access_token) {
+          setUser({
+            ...session.user,
+            access_token: session.access_token
+          })
+        }
       } catch (error) {
-        console.error('Error getting initial user:', error)
+        console.error('Error getting initial session:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    getInitialUser()
+    getInitialSession()
 
     // 监听认证状态变化
-    const { data: { subscription } } = AuthService.onAuthStateChange((user) => {
-      setUser(user)
+    const { data: { subscription } } = AuthService.onAuthStateChange((user, session) => {
+      if (user && session?.access_token) {
+        setUser({
+          ...user,
+          access_token: session.access_token
+        })
+      } else {
+        setUser(null)
+      }
       setLoading(false)
     })
 

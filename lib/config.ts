@@ -6,7 +6,7 @@ interface Config {
     anonKey: string
     serviceRoleKey?: string
   }
-  cloudflare?: {
+  cloudflare: {
     accountId: string
     imagesToken: string
   }
@@ -24,20 +24,16 @@ export function getConfig(): Config {
     supabase: {
       url: validateEnvVar('NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL),
       anonKey: validateEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    },
+    cloudflare: {
+      accountId: validateEnvVar('CLOUDFLARE_ACCOUNT_ID', process.env.CLOUDFLARE_ACCOUNT_ID),
+      imagesToken: validateEnvVar('CLOUDFLARE_IMAGES_TOKEN', process.env.CLOUDFLARE_IMAGES_TOKEN),
     }
   }
 
   // Service role key is only needed on the server side
   if (typeof window === 'undefined') {
     config.supabase.serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  }
-
-  // Cloudflare Images config (optional for now)
-  if (process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_IMAGES_TOKEN) {
-    config.cloudflare = {
-      accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
-      imagesToken: process.env.CLOUDFLARE_IMAGES_TOKEN,
-    }
   }
 
   return config
@@ -59,6 +55,12 @@ export function validateConfig(): boolean {
       new URL(config.supabase.url)
     } catch {
       console.error('Invalid Supabase URL format')
+      return false
+    }
+
+    // 检查 Cloudflare Images 配置
+    if (!config.cloudflare.accountId || !config.cloudflare.imagesToken) {
+      console.error('Cloudflare Images configuration is incomplete')
       return false
     }
 

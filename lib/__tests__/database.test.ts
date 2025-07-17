@@ -6,7 +6,9 @@ import { describe, it, expect, beforeAll } from '@jest/globals'
 const mockEnvVars = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://test-project.supabase.co',
   NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
-  SUPABASE_SERVICE_ROLE_KEY: 'test-service-role-key'
+  SUPABASE_SERVICE_ROLE_KEY: 'test-service-role-key',
+  CLOUDFLARE_ACCOUNT_ID: 'test-account-id',
+  CLOUDFLARE_IMAGES_TOKEN: 'test-images-token'
 }
 
 describe('Database Configuration', () => {
