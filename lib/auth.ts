@@ -8,7 +8,7 @@ export interface AuthError {
 
 export interface AuthResult {
   success: boolean
-  user?: User
+  user?: User | null
   error?: AuthError
 }
 
@@ -139,7 +139,23 @@ export class AuthService {
    */
   static onAuthStateChange(callback: (user: User | null) => void) {
     return supabase.auth.onAuthStateChange((event, session) => {
-      callback(session?.user ?? null)
+      // 处理不同的认证事件
+      switch (event) {
+        case 'SIGNED_IN':
+          callback(session?.user ?? null)
+          break
+        case 'SIGNED_OUT':
+          callback(null)
+          break
+        case 'TOKEN_REFRESHED':
+          callback(session?.user ?? null)
+          break
+        case 'USER_UPDATED':
+          callback(session?.user ?? null)
+          break
+        default:
+          callback(session?.user ?? null)
+      }
     })
   }
 

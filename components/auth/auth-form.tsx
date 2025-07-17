@@ -18,10 +18,12 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setIsLoading(true)
 
     // 表单验证
@@ -43,6 +45,14 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
       return
     }
 
+    // 邮箱格式验证
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('请输入有效的邮箱地址')
+      setIsLoading(false)
+      return
+    }
+
     try {
       let result
       if (mode === 'login') {
@@ -53,16 +63,21 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
 
       if (result.success) {
         if (mode === 'register') {
-          setError('')
-          alert('注册成功！请检查您的邮箱并点击验证链接。')
+          // 显示成功消息
+          setSuccess('注册成功！请检查您的邮箱并点击验证链接完成注册。')
+          // 清空表单
+          setEmail('')
+          setPassword('')
+          setConfirmPassword('')
         } else {
           onSuccess?.()
         }
       } else {
-        setError(result.error?.message || '操作失败')
+        setError(result.error?.message || '操作失败，请稍后重试')
       }
     } catch (error) {
-      setError('网络错误，请稍后重试')
+      console.error('Auth error:', error)
+      setError('网络连接错误，请检查网络后重试')
     } finally {
       setIsLoading(false)
     }
@@ -117,6 +132,12 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
           {error && (
             <div className="text-red-500 text-sm text-center">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="text-green-600 text-sm text-center">
+              {success}
             </div>
           )}
 

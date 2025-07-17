@@ -72,7 +72,7 @@ export function isValidDate(dateString: string): boolean {
 }
 
 export function isValidImageFile(file: File): boolean {
-  return VALIDATION_RULES.IMAGE.ALLOWED_TYPES.includes(file.type) &&
+  return (VALIDATION_RULES.IMAGE.ALLOWED_TYPES as readonly string[]).includes(file.type) &&
          file.size <= VALIDATION_RULES.IMAGE.MAX_SIZE
 }
 
@@ -162,7 +162,7 @@ export function validateImageUpload(file: File): FormValidationResult {
   if (!file) {
     errors.push({ field: 'file', message: '请选择图片文件' })
   } else {
-    if (!VALIDATION_RULES.IMAGE.ALLOWED_TYPES.includes(file.type)) {
+    if (!(VALIDATION_RULES.IMAGE.ALLOWED_TYPES as readonly string[]).includes(file.type)) {
       errors.push({ 
         field: 'file', 
         message: `只支持以下图片格式: ${VALIDATION_RULES.IMAGE.ALLOWED_TYPES.join(', ')}` 
