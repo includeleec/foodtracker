@@ -1,5 +1,6 @@
 // Jest setup file
 // Add any global test setup here
+import '@testing-library/jest-dom'
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -36,6 +37,12 @@ jest.mock('./lib/supabase', () => ({
     },
   },
 }))
+
+// Mock window.alert
+Object.defineProperty(window, 'alert', {
+  writable: true,
+  value: jest.fn(),
+})
 
 // Set test environment variables
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test-project.supabase.co'
