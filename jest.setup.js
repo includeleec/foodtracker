@@ -1,6 +1,6 @@
 // Jest setup file
 // Add any global test setup here
-import '@testing-library/jest-dom'
+require('@testing-library/jest-dom')
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
