@@ -1,0 +1,552 @@
+{
+  "timestamp": "2025-07-18T06:52:04.675Z",
+  "totalIssues": 78,
+  "issues": [
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\341.df3329d77a5faa19.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\4bd1b696-67ee12fb04071d3b.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\app\\_not-found\\page-f08302ee705a96b1.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\framework-f593a28cde54158e.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\main-f8719266e809513a.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\pages\\_error-71d2b6a7b832d02a.js",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": ".open-next\\assets\\_next\\static\\chunks\\polyfills-42372ed130431b0a.js",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": "lib\\__tests__\\security-utils.test.ts",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "critical",
+      "category": "Unsafe Code Pattern",
+      "file": "scripts\\security-scan.ts",
+      "message": "使用了 eval() 函数，存在代码注入风险",
+      "recommendation": "避免使用 eval()，使用更安全的替代方案"
+    },
+    {
+      "type": "critical",
+      "category": "Unsafe Code Pattern",
+      "file": "scripts\\security-scan.ts",
+      "message": "使用了 eval() 函数，存在代码注入风险",
+      "recommendation": "避免使用 eval()，使用更安全的替代方案"
+    },
+    {
+      "type": "high",
+      "category": "Unsafe Code Pattern",
+      "file": "scripts\\security-scan.ts",
+      "message": "使用 document.write() 可能导致 XSS 攻击",
+      "recommendation": "使用现代 DOM 操作方法"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": "scripts\\security-scan.ts",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": "scripts\\security-scan.ts",
+      "message": "使用 dangerouslySetInnerHTML 存在 XSS 风险",
+      "recommendation": "确保内容已经过适当的清理和验证"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": "scripts\\security-scan.ts",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Unsafe Code Pattern",
+      "file": "__tests__\\security-integration.test.ts",
+      "message": "Math.random() 不适用于安全相关的随机数生成",
+      "recommendation": "对于安全用途，使用 crypto.getRandomValues()"
+    },
+    {
+      "type": "medium",
+      "category": "Missing Security Header",
+      "file": "next.config.ts",
+      "message": "缺少安全头部: X-XSS-Protection",
+      "recommendation": "在 Next.js 配置中添加 X-XSS-Protection 头部"
+    },
+    {
+      "type": "medium",
+      "category": "Missing Security Header",
+      "file": "next.config.ts",
+      "message": "缺少安全头部: X-Content-Type-Options",
+      "recommendation": "在 Next.js 配置中添加 X-Content-Type-Options 头部"
+    },
+    {
+      "type": "medium",
+      "category": "Missing Security Header",
+      "file": "next.config.ts",
+      "message": "缺少安全头部: X-Frame-Options",
+      "recommendation": "在 Next.js 配置中添加 X-Frame-Options 头部"
+    },
+    {
+      "type": "medium",
+      "category": "Missing Security Header",
+      "file": "next.config.ts",
+      "message": "缺少安全头部: Strict-Transport-Security",
+      "recommendation": "在 Next.js 配置中添加 Strict-Transport-Security 头部"
+    },
+    {
+      "type": "medium",
+      "category": "Missing Security Header",
+      "file": "next.config.ts",
+      "message": "缺少安全头部: Content-Security-Policy",
+      "recommendation": "在 Next.js 配置中添加 Content-Security-Policy 头部"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "app\\api\\food-records\\route.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "app\\api\\upload\\[id]\\route.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "app\\dashboard\\history\\__tests__\\page.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "app\\dashboard\\today\\__tests__\\page.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "cloudflare-env.d.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\calendar\\calendar-day.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\calendar\\food-calendar.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\calendar\\__tests__\\food-calendar.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\food\\food-records-display.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\food\\__tests__\\food-record-card.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\food\\__tests__\\food-records-display.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\food\\__tests__\\meal-section.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\ui\\form-field.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\ui\\image-upload.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "components\\ui\\__tests__\\confirm-dialog.test.tsx",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "database\\__tests__\\rls-security.test.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "hooks\\use-food-records.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "lib\\cache-utils.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "lib\\database.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "lib\\image-utils.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "lib\\security-utils.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "lib\\__tests__\\image-utils.test.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    },
+    {
+      "type": "high",
+      "category": "SQL Injection Risk",
+      "file": "scripts\\security-scan.ts",
+      "message": "可能存在 SQL 注入风险的查询构造",
+      "recommendation": "使用参数化查询或 ORM 来防止 SQL 注入"
+    }
+  ]
+}

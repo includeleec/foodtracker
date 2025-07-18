@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { FoodRecordService } from '@/lib/database'
 import type { FoodRecordInsert, ApiResponse, FoodRecord } from '@/types/database'
+import { 
+  validateRequestOrigin, 
+  checkRateLimit, 
+  sanitizeInput, 
+  validateSqlInput,
+  getSecurityHeaders,
+  validateJwtFormat
+} from '@/lib/security-utils'
 
 // 验证用户身份并获取用户ID
 async function validateUserAndGetId(request: NextRequest): Promise<string> {
@@ -13,6 +21,12 @@ async function validateUserAndGetId(request: NextRequest): Promise<string> {
   }
 
   const token = authHeader.substring(7)
+  
+  // 验证 JWT 格式
+  if (!validateJwtFormat(token)) {
+    throw new Error('Invalid JWT format')
+  }
+  
   const { data: { user }, error } = await supabase.auth.getUser(token)
   
   if (error || !user) {
@@ -22,9 +36,37 @@ async function validateUserAndGetId(request: NextRequest): Promise<string> {
   return user.id
 }
 
+// 安全验证中间件
+async function securityMiddleware(request: NextRequest): Promise<void> {
+  // 验证请求来源
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'https://*.pages.dev', // Cloudflare Pages
+    'https://*.workers.dev' // Cloudflare Workers
+  ]
+  
+  if (!validateRequestOrigin(request, allowedOrigins)) {
+    throw new Error('Invalid request origin')
+  }
+  
+  // 速率限制
+  const clientIp = request.headers.get('cf-connecting-ip') || 
+                   request.headers.get('x-forwarded-for') || 
+                   'unknown'
+  
+  const rateLimit = checkRateLimit(`api:${clientIp}`, 100, 15 * 60 * 1000) // 100 requests per 15 minutes
+  
+  if (!rateLimit.allowed) {
+    throw new Error('Rate limit exceeded')
+  }
+}
+
 // GET /api/food-records - 获取食物记录
 export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<FoodRecord[]>>> {
   try {
+    // 安全验证
+    await securityMiddleware(request)
+    
     // 验证用户身份
     const userId = await validateUserAndGetId(request)
 
@@ -35,38 +77,79 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     if (!date) {
       return NextResponse.json(
         { success: false, error: '缺少日期参数' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
+
+    // 清理和验证日期输入
+    const cleanDate = sanitizeInput(date)
+    if (!validateSqlInput(cleanDate)) {
+      return NextResponse.json(
+        { success: false, error: '日期参数包含非法字符' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
     // 验证日期格式 (YYYY-MM-DD)
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-    if (!dateRegex.test(date)) {
+    if (!dateRegex.test(cleanDate)) {
       return NextResponse.json(
         { success: false, error: '日期格式无效，请使用 YYYY-MM-DD 格式' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
+
+    // 验证日期范围（防止查询过于久远的数据）
+    const requestDate = new Date(cleanDate)
+    const minDate = new Date('2020-01-01')
+    const maxDate = new Date()
+    maxDate.setDate(maxDate.getDate() + 1) // 允许明天的日期
+
+    if (requestDate < minDate || requestDate > maxDate) {
+      return NextResponse.json(
+        { success: false, error: '日期超出允许范围' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
     // 获取指定日期的食物记录
-    const records = await FoodRecordService.getFoodRecordsByDate(date)
+    const records = await FoodRecordService.getFoodRecordsByDate(cleanDate)
     
-    // 过滤只返回当前用户的记录
+    // 过滤只返回当前用户的记录（双重验证）
     const userRecords = records.filter(record => record.user_id === userId)
 
     return NextResponse.json({
       success: true,
       data: userRecords
+    }, {
+      headers: getSecurityHeaders()
     })
 
   } catch (error) {
     console.error('GET food-records API error:', error)
     
     const errorMessage = error instanceof Error ? error.message : '获取食物记录失败'
+    const statusCode = error instanceof Error && error.message.includes('Rate limit') ? 429 :
+                      error instanceof Error && error.message.includes('origin') ? 403 : 500
     
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { 
+        status: statusCode,
+        headers: getSecurityHeaders()
+      }
     )
   }
 }
@@ -74,6 +157,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
 // POST /api/food-records - 创建食物记录
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<FoodRecord>>> {
   try {
+    // 安全验证
+    await securityMiddleware(request)
+    
     // 验证用户身份
     const userId = await validateUserAndGetId(request)
 
@@ -87,53 +173,143 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     if (missingFields.length > 0) {
       return NextResponse.json(
         { success: false, error: `缺少必填字段: ${missingFields.join(', ')}` },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
+
+    // 清理和验证输入数据
+    const cleanFoodName = sanitizeInput(body.food_name)
+    const cleanMealType = sanitizeInput(body.meal_type)
+    const cleanRecordDate = sanitizeInput(body.record_date)
+    
+    // 验证输入是否包含恶意内容
+    if (!validateSqlInput(cleanFoodName) || !validateSqlInput(cleanMealType) || !validateSqlInput(cleanRecordDate)) {
+      return NextResponse.json(
+        { success: false, error: '输入数据包含非法字符' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
     // 验证餐次类型
     const validMealTypes = ['breakfast', 'lunch', 'dinner', 'snack']
-    if (!validMealTypes.includes(body.meal_type)) {
+    if (!validMealTypes.includes(cleanMealType)) {
       return NextResponse.json(
         { success: false, error: '无效的餐次类型' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
+
+    // 验证食物名称长度
+    if (cleanFoodName.length === 0 || cleanFoodName.length > 255) {
+      return NextResponse.json(
+        { success: false, error: '食物名称长度必须在1-255字符之间' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
     // 验证数值字段
-    if (typeof body.weight !== 'number' || body.weight <= 0) {
+    const weight = Number(body.weight)
+    const calories = Number(body.calories)
+    
+    if (isNaN(weight) || weight <= 0 || weight > 10000) {
       return NextResponse.json(
-        { success: false, error: '重量必须是大于0的数字' },
-        { status: 400 }
+        { success: false, error: '重量必须是0-10000之间的数字' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
-    if (typeof body.calories !== 'number' || body.calories <= 0) {
+    if (isNaN(calories) || calories <= 0 || calories > 10000) {
       return NextResponse.json(
-        { success: false, error: '卡路里必须是大于0的数字' },
-        { status: 400 }
+        { success: false, error: '卡路里必须是0-10000之间的数字' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
-    // 验证日期格式
+    // 验证日期格式和范围
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-    if (!dateRegex.test(body.record_date)) {
+    if (!dateRegex.test(cleanRecordDate)) {
       return NextResponse.json(
         { success: false, error: '日期格式无效，请使用 YYYY-MM-DD 格式' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
+    }
+
+    const recordDate = new Date(cleanRecordDate)
+    const minDate = new Date('2020-01-01')
+    const maxDate = new Date()
+    maxDate.setDate(maxDate.getDate() + 1) // 允许明天的日期
+
+    if (recordDate < minDate || recordDate > maxDate) {
+      return NextResponse.json(
+        { success: false, error: '日期超出允许范围' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
+
+    // 验证图片URL（如果提供）
+    let cleanImageUrl = null
+    let cleanImageId = null
+    
+    if (body.image_url) {
+      cleanImageUrl = sanitizeInput(body.image_url)
+      if (!cleanImageUrl.startsWith('https://imagedelivery.net/')) {
+        return NextResponse.json(
+          { success: false, error: '无效的图片URL' },
+          { 
+            status: 400,
+            headers: getSecurityHeaders()
+          }
+        )
+      }
+    }
+    
+    if (body.image_id) {
+      cleanImageId = sanitizeInput(body.image_id)
+      if (!validateSqlInput(cleanImageId) || cleanImageId.length > 255) {
+        return NextResponse.json(
+          { success: false, error: '无效的图片ID' },
+          { 
+            status: 400,
+            headers: getSecurityHeaders()
+          }
+        )
+      }
     }
 
     // 构建插入数据
     const insertData: FoodRecordInsert = {
       user_id: userId,
-      meal_type: body.meal_type,
-      food_name: body.food_name.trim(),
-      weight: body.weight,
-      calories: body.calories,
-      record_date: body.record_date,
-      image_url: body.image_url || null,
-      image_id: body.image_id || null
+      meal_type: cleanMealType as any,
+      food_name: cleanFoodName,
+      weight: weight,
+      calories: calories,
+      record_date: cleanRecordDate,
+      image_url: cleanImageUrl,
+      image_id: cleanImageId
     }
 
     // 创建食物记录
@@ -142,16 +318,23 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     return NextResponse.json({
       success: true,
       data: newRecord
+    }, {
+      headers: getSecurityHeaders()
     })
 
   } catch (error) {
     console.error('POST food-records API error:', error)
     
     const errorMessage = error instanceof Error ? error.message : '创建食物记录失败'
+    const statusCode = error instanceof Error && error.message.includes('Rate limit') ? 429 :
+                      error instanceof Error && error.message.includes('origin') ? 403 : 500
     
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { 
+        status: statusCode,
+        headers: getSecurityHeaders()
+      }
     )
   }
 }
@@ -161,9 +344,11 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      ...getSecurityHeaders(),
+      'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400', // 24 hours
     },
   })
 }

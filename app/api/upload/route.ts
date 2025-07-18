@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getConfig } from '@/lib/config'
 import { createClient } from '@supabase/supabase-js'
+import { 
+  validateRequestOrigin, 
+  checkRateLimit, 
+  validateFileUpload,
+  validateImageMagicNumbers,
+  getSecurityHeaders,
+  validateJwtFormat
+} from '@/lib/security-utils'
 
 // 支持的图片格式
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
@@ -43,6 +51,12 @@ async function validateUser(request: NextRequest) {
   }
 
   const token = authHeader.substring(7)
+  
+  // 验证 JWT 格式
+  if (!validateJwtFormat(token)) {
+    throw new Error('Invalid JWT format')
+  }
+  
   const { data: { user }, error } = await supabase.auth.getUser(token)
   
   if (error || !user) {
@@ -50,6 +64,31 @@ async function validateUser(request: NextRequest) {
   }
 
   return user
+}
+
+// 安全验证中间件
+async function securityMiddleware(request: NextRequest): Promise<void> {
+  // 验证请求来源
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'https://*.pages.dev', // Cloudflare Pages
+    'https://*.workers.dev' // Cloudflare Workers
+  ]
+  
+  if (!validateRequestOrigin(request, allowedOrigins)) {
+    throw new Error('Invalid request origin')
+  }
+  
+  // 速率限制 - 图片上传更严格的限制
+  const clientIp = request.headers.get('cf-connecting-ip') || 
+                   request.headers.get('x-forwarded-for') || 
+                   'unknown'
+  
+  const rateLimit = checkRateLimit(`upload:${clientIp}`, 20, 15 * 60 * 1000) // 20 uploads per 15 minutes
+  
+  if (!rateLimit.allowed) {
+    throw new Error('Upload rate limit exceeded')
+  }
 }
 
 // 验证文件
@@ -106,6 +145,9 @@ async function uploadToCloudflare(file: File): Promise<CloudflareImagesResponse>
 
 export async function POST(request: NextRequest): Promise<NextResponse<UploadResponse>> {
   try {
+    // 安全验证
+    await securityMiddleware(request)
+    
     // 验证用户身份
     await validateUser(request)
 
@@ -116,12 +158,36 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
     if (!file) {
       return NextResponse.json(
         { success: false, error: '未找到上传文件' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
       )
     }
 
-    // 验证文件
-    validateFile(file)
+    // 使用增强的文件验证
+    const fileValidation = validateFileUpload(file)
+    if (!fileValidation.valid) {
+      return NextResponse.json(
+        { success: false, error: fileValidation.errors.join('; ') },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
+
+    // 验证图片魔数（文件头）
+    const isMagicNumberValid = await validateImageMagicNumbers(file)
+    if (!isMagicNumberValid) {
+      return NextResponse.json(
+        { success: false, error: '文件不是有效的图片格式' },
+        { 
+          status: 400,
+          headers: getSecurityHeaders()
+        }
+      )
+    }
 
     // 上传到 Cloudflare Images
     const uploadResult = await uploadToCloudflare(file)
@@ -136,16 +202,23 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
         url: imageUrl,
         filename: uploadResult.result.filename,
       }
+    }, {
+      headers: getSecurityHeaders()
     })
 
   } catch (error) {
     console.error('Upload API error:', error)
     
     const errorMessage = error instanceof Error ? error.message : '图片上传失败'
+    const statusCode = error instanceof Error && error.message.includes('rate limit') ? 429 :
+                      error instanceof Error && error.message.includes('origin') ? 403 : 500
     
     return NextResponse.json(
       { success: false, error: errorMessage },
-      { status: 500 }
+      { 
+        status: statusCode,
+        headers: getSecurityHeaders()
+      }
     )
   }
 }
@@ -155,9 +228,11 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      ...getSecurityHeaders(),
+      'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400', // 24 hours
     },
   })
 }
