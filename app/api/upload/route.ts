@@ -84,7 +84,13 @@ async function securityMiddleware(request: NextRequest): Promise<void> {
                    request.headers.get('x-forwarded-for') || 
                    'unknown'
   
-  const rateLimit = checkRateLimit(`upload:${clientIp}`, 20, 15 * 60 * 1000) // 20 uploads per 15 minutes
+  // 开发环境允许更多上传
+  const isDev = process.env.NODE_ENV === 'development'
+  const rateLimit = checkRateLimit(
+    `upload:${clientIp}`, 
+    isDev ? 200 : 20, // 开发环境200上传/15分钟，生产环境20上传/15分钟
+    15 * 60 * 1000
+  )
   
   if (!rateLimit.allowed) {
     throw new Error('Upload rate limit exceeded')

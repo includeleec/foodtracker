@@ -49,12 +49,18 @@ async function securityMiddleware(request: NextRequest): Promise<void> {
     throw new Error('Invalid request origin')
   }
   
-  // 速率限制
+  // 速率限制 - 开发环境使用更宽松的限制
   const clientIp = request.headers.get('cf-connecting-ip') || 
                    request.headers.get('x-forwarded-for') || 
                    'unknown'
   
-  const rateLimit = checkRateLimit(`api:${clientIp}`, 100, 15 * 60 * 1000) // 100 requests per 15 minutes
+  // 开发环境允许更多请求
+  const isDev = process.env.NODE_ENV === 'development'
+  const rateLimit = checkRateLimit(
+    `api:${clientIp}`, 
+    isDev ? 1000 : 100, // 开发环境1000请求/15分钟，生产环境100请求/15分钟
+    15 * 60 * 1000
+  )
   
   if (!rateLimit.allowed) {
     throw new Error('Rate limit exceeded')

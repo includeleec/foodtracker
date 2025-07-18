@@ -2,9 +2,20 @@
 
 import { useNetworkStatus } from '@/hooks/use-network-status'
 import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 export function NetworkStatus({ className }: { className?: string }) {
   const { isOnline, isSlowConnection } = useNetworkStatus()
+  const [isMounted, setIsMounted] = useState(false)
+
+  // 防止 SSR 和客户端渲染不一致
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null // SSR 期间不渲染，避免 hydration 不匹配
+  }
 
   if (isOnline && !isSlowConnection) {
     return null // 网络正常时不显示
@@ -30,6 +41,20 @@ export function NetworkStatus({ className }: { className?: string }) {
 // 网络状态指示器组件
 export function NetworkIndicator({ className }: { className?: string }) {
   const { isOnline, isSlowConnection } = useNetworkStatus()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return (
+      <div className={cn('flex items-center space-x-1', className)}>
+        <div className="w-2 h-2 rounded-full bg-gray-300" />
+        <span className="text-xs text-gray-400">检测中</span>
+      </div>
+    )
+  }
 
   return (
     <div className={cn('flex items-center space-x-1', className)}>

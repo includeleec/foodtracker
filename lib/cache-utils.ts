@@ -1,3 +1,5 @@
+"use client"
+
 // 客户端缓存工具
 
 interface CacheItem<T> {
@@ -82,7 +84,7 @@ export const CacheKeys = {
   
   // 图片相关
   imageUpload: (imageId: string) => `image_upload_${imageId}`,
-} as const
+}
 
 // 带缓存的数据获取函数
 export async function getCachedData<T>(

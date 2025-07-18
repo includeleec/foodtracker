@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import { apiCallWithRetry } from './retry-utils'
 import { handleError, CustomError, ERROR_CODES } from './error-utils'
-import { getCachedData, CacheKeys, CacheInvalidation } from './cache-utils'
+import { getServerCachedData, ServerCacheKeys, ServerCacheInvalidation } from './server-cache'
 import type { FoodRecord, FoodRecordInsert, FoodRecordUpdate } from '../types/database'
 
 // 分页查询选项
@@ -25,8 +25,8 @@ interface PaginatedResult<T> {
 export class FoodRecordService {
   // 获取指定日期的食物记录（带缓存）
   static async getFoodRecordsByDate(date: string): Promise<FoodRecord[]> {
-    return getCachedData(
-      CacheKeys.foodRecords(date),
+    return getServerCachedData(
+      ServerCacheKeys.foodRecords(date),
       async () => {
         try {
           return await apiCallWithRetry(async () => {
@@ -124,8 +124,8 @@ export class FoodRecordService {
       })
 
       // 失效相关缓存
-      CacheInvalidation.invalidateFoodRecords(record.record_date)
-      CacheInvalidation.invalidateAllFoodRecords()
+      ServerCacheInvalidation.invalidateFoodRecords(record.record_date)
+      ServerCacheInvalidation.invalidateAllFoodRecords()
 
       return result
     } catch (error) {
@@ -154,9 +154,9 @@ export class FoodRecordService {
 
       // 失效相关缓存
       if (updates.record_date) {
-        CacheInvalidation.invalidateFoodRecords(updates.record_date)
+        ServerCacheInvalidation.invalidateFoodRecords(updates.record_date)
       }
-      CacheInvalidation.invalidateAllFoodRecords()
+      ServerCacheInvalidation.invalidateAllFoodRecords()
 
       return result
     } catch (error) {
@@ -181,9 +181,9 @@ export class FoodRecordService {
 
       // 失效相关缓存
       if (recordDate) {
-        CacheInvalidation.invalidateFoodRecords(recordDate)
+        ServerCacheInvalidation.invalidateFoodRecords(recordDate)
       }
-      CacheInvalidation.invalidateAllFoodRecords()
+      ServerCacheInvalidation.invalidateAllFoodRecords()
     } catch (error) {
       const appError = handleError(error, 'deleteFoodRecord')
       throw new CustomError(appError.code, appError.message, appError.details)
@@ -192,8 +192,8 @@ export class FoodRecordService {
 
   // 获取用户在指定日期范围内有记录的日期（带缓存）
   static async getRecordDates(startDate: string, endDate: string): Promise<string[]> {
-    return getCachedData(
-      CacheKeys.recordDates(startDate, endDate),
+    return getServerCachedData(
+      ServerCacheKeys.recordDates(startDate, endDate),
       async () => {
         try {
           return await apiCallWithRetry(async () => {
