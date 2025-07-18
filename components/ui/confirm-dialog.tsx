@@ -6,26 +6,26 @@ import { cn } from '@/lib/utils'
 
 interface ConfirmDialogProps {
   isOpen: boolean
-  onClose: () => void
+  onCancel: () => void
   onConfirm: () => void
-  title: string
+  title?: string
   message: string
   confirmText?: string
   cancelText?: string
-  variant?: 'danger' | 'warning' | 'info'
+  type?: 'danger' | 'warning' | 'info'
   isLoading?: boolean
   className?: string
 }
 
 export function ConfirmDialog({
   isOpen,
-  onClose,
+  onCancel,
   onConfirm,
   title,
   message,
   confirmText = '确认',
   cancelText = '取消',
-  variant = 'danger',
+  type = 'danger',
   isLoading = false,
   className
 }: ConfirmDialogProps) {
@@ -35,13 +35,13 @@ export function ConfirmDialog({
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !isLoading) {
-      onClose()
+      onCancel()
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape' && !isLoading) {
-      onClose()
+      onCancel()
     }
   }
 
@@ -66,7 +66,7 @@ export function ConfirmDialog({
     }
   }
 
-  const style = variantStyles[variant]
+  const style = variantStyles[type]
 
   return (
     <div
@@ -118,7 +118,7 @@ export function ConfirmDialog({
         <div className="flex flex-col-reverse gap-3 px-6 pb-6 sm:flex-row sm:justify-end">
           <Button
             variant="outline"
-            onClick={onClose}
+            onClick={onCancel}
             disabled={isLoading}
             className="w-full sm:w-auto"
           >

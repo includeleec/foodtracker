@@ -10,6 +10,10 @@ export interface ToastProps {
   duration?: number
   onClose?: () => void
   className?: string
+  action?: {
+    label: string
+    onClick: () => void
+  }
 }
 
 const toastStyles = {
@@ -32,7 +36,8 @@ export function Toast({
   message, 
   duration = 5000, 
   onClose, 
-  className 
+  className,
+  action
 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(true)
 
@@ -73,6 +78,14 @@ export function Toast({
               <h4 className="text-sm font-medium mb-1">{title}</h4>
             )}
             <p className="text-sm">{message}</p>
+            {action && (
+              <button
+                onClick={action.onClick}
+                className="mt-2 text-sm font-medium underline hover:no-underline focus:outline-none"
+              >
+                {action.label}
+              </button>
+            )}
           </div>
           <button
             onClick={handleClose}
