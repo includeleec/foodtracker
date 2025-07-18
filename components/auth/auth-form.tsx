@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ButtonLoading } from '@/components/ui/loading-spinner'
+import { Toast } from '@/components/ui/toast'
 import { AuthService } from '@/lib/auth'
 
 interface AuthFormProps {
@@ -84,15 +86,15 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-6">
+    <div className="w-full max-w-md mx-auto px-4">
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-md">
+        <h2 className="text-xl md:text-2xl font-bold text-center mb-6">
           {mode === 'login' ? '登录' : '注册'}
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">邮箱</Label>
+            <Label htmlFor="email" className="text-sm font-medium">邮箱</Label>
             <Input
               id="email"
               type="email"
@@ -100,11 +102,13 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="请输入邮箱"
               required
+              disabled={isLoading}
+              className="mt-1 h-11" // 增加高度以便移动端操作
             />
           </div>
 
           <div>
-            <Label htmlFor="password">密码</Label>
+            <Label htmlFor="password" className="text-sm font-medium">密码</Label>
             <Input
               id="password"
               type="password"
@@ -112,12 +116,14 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
               required
+              disabled={isLoading}
+              className="mt-1 h-11"
             />
           </div>
 
           {mode === 'register' && (
             <div>
-              <Label htmlFor="confirmPassword">确认密码</Label>
+              <Label htmlFor="confirmPassword" className="text-sm font-medium">确认密码</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -125,28 +131,34 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="请再次输入密码"
                 required
+                disabled={isLoading}
+                className="mt-1 h-11"
               />
             </div>
           )}
 
           {error && (
-            <div className="text-red-500 text-sm text-center">
+            <div className="bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-md text-sm">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="text-green-600 text-sm text-center">
+            <div className="bg-green-50 border border-green-200 text-green-800 px-3 py-2 rounded-md text-sm">
               {success}
             </div>
           )}
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full h-11 text-base"
             disabled={isLoading}
           >
-            {isLoading ? '处理中...' : (mode === 'login' ? '登录' : '注册')}
+            {isLoading ? (
+              <ButtonLoading text={mode === 'login' ? '登录中...' : '注册中...'} />
+            ) : (
+              mode === 'login' ? '登录' : '注册'
+            )}
           </Button>
         </form>
 
@@ -154,7 +166,8 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
           <button
             type="button"
             onClick={() => onModeChange?.(mode === 'login' ? 'register' : 'login')}
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className="text-blue-600 hover:text-blue-800 text-sm transition-colors"
+            disabled={isLoading}
           >
             {mode === 'login' ? '没有账号？点击注册' : '已有账号？点击登录'}
           </button>

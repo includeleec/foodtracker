@@ -259,12 +259,12 @@ export function FoodRecordForm({
         </div>
       )}
 
-      {/* 餐次类型选择 */}
+      {/* 餐次类型选择 - 响应式网格 */}
       <div className="space-y-2">
         <Label htmlFor="meal_type" className="text-base font-medium">
           餐次类型 <span className="text-red-500">*</span>
         </Label>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           {MEAL_TYPE_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -272,11 +272,12 @@ export function FoodRecordForm({
               onClick={() => handleInputChange('meal_type', option.value)}
               disabled={isFormDisabled}
               className={cn(
-                'px-4 py-2 rounded-md border text-sm font-medium transition-colors',
+                'px-3 py-2 md:px-4 md:py-2 rounded-md border text-sm font-medium transition-colors',
                 'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+                'min-h-[44px] flex items-center justify-center', // 确保触摸友好的最小高度
                 formData.meal_type === option.value
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100',
                 isFormDisabled && 'opacity-50 cursor-not-allowed'
               )}
             >

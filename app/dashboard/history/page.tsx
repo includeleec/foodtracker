@@ -5,6 +5,7 @@ import { FoodCalendar } from '@/components/calendar'
 import { FoodRecordsDisplay } from '@/components/food'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { ContentLoading } from '@/components/ui/loading-spinner'
 import { FoodRecordService } from '@/lib/database'
 import { getCurrentDate, formatDateWithWeekday } from '@/lib/date-utils'
 import type { FoodRecord } from '@/types/database'
@@ -44,15 +45,15 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">历史记录</h1>
+    <div className="space-y-4 md:space-y-6">
+      <div className="bg-white shadow rounded-lg p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">历史记录</h1>
         <p className="text-gray-600">查看过往的饮食记录</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         {/* 日历组件 */}
-        <div className="lg:col-span-1">
+        <div className="xl:col-span-1">
           <FoodCalendar
             selectedDate={selectedDate}
             onDateSelect={handleDateSelect}
@@ -61,8 +62,8 @@ export default function HistoryPage() {
         </div>
 
         {/* 记录显示区域 */}
-        <div className="lg:col-span-1">
-          <Card className="p-6">
+        <div className="xl:col-span-1">
+          <Card className="p-4 md:p-6">
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 {formatDateWithWeekday(selectedDate)}
@@ -88,10 +89,7 @@ export default function HistoryPage() {
 
             {/* 加载状态 */}
             {loading && !error && (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                <p className="text-gray-500">加载中...</p>
-              </div>
+              <ContentLoading text="加载记录中..." />
             )}
 
             {/* 记录内容 */}

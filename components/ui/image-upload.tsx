@@ -216,18 +216,18 @@ export function ImageUpload({
         disabled={disabled || isLoading}
       />
 
-      {/* 上传区域 */}
+      {/* 上传区域 - 响应式设计 */}
       <div
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
-          transition-colors duration-200
+          relative border-2 border-dashed rounded-lg p-4 md:p-6 text-center cursor-pointer
+          transition-colors duration-200 min-h-[120px] md:min-h-[160px]
           ${isDragOver 
             ? 'border-blue-500 bg-blue-50' 
-            : 'border-gray-300 hover:border-gray-400'
+            : 'border-gray-300 hover:border-gray-400 active:border-blue-400'
           }
           ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
           ${showPreview ? 'border-solid border-gray-200' : ''}
@@ -281,14 +281,14 @@ export function ImageUpload({
           </div>
         )}
 
-        {/* 上传提示 */}
+        {/* 上传提示 - 响应式文本 */}
         {!showPreview && (
-          <div className="py-8">
-            <div className="text-4xl text-gray-400 mb-4">📷</div>
-            <div className="text-lg font-medium text-gray-700 mb-2">
+          <div className="py-6 md:py-8">
+            <div className="text-3xl md:text-4xl text-gray-400 mb-3 md:mb-4">📷</div>
+            <div className="text-base md:text-lg font-medium text-gray-700 mb-2">
               {isDragOver ? '释放以上传图片' : '点击或拖拽上传图片'}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-xs md:text-sm text-gray-500 px-2">
               支持 {acceptedTypes.map(type => type.split('/')[1]).join(', ')} 格式，
               最大 {maxSizeMB}MB
             </div>

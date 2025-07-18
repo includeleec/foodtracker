@@ -114,39 +114,43 @@ export function FoodCalendar({ selectedDate, onDateSelect, className = '' }: Foo
   }
 
   return (
-    <Card className={`p-4 ${className}`}>
-      {/* 日历头部 */}
-      <div className="flex items-center justify-between mb-4">
-        <Button 
-          onClick={handlePreviousMonth}
-          variant="outline"
-          size="sm"
-          disabled={loading}
-        >
-          ← 上月
-        </Button>
-        
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">
-            {formatDate(currentDate, 'month-year')}
-          </h2>
+    <Card className={`p-3 md:p-4 ${className}`}>
+      {/* 日历头部 - 响应式布局 */}
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:justify-start sm:gap-2">
           <Button 
-            onClick={handleToday}
+            onClick={handlePreviousMonth}
             variant="outline"
             size="sm"
             disabled={loading}
+            className="flex-shrink-0"
           >
-            今天
+            ← 上月
+          </Button>
+          
+          <h2 className="text-base md:text-lg font-semibold mx-4 sm:mx-0">
+            {formatDate(currentDate, 'month-year')}
+          </h2>
+          
+          <Button 
+            onClick={handleNextMonth}
+            variant="outline"
+            size="sm"
+            disabled={loading}
+            className="flex-shrink-0"
+          >
+            下月 →
           </Button>
         </div>
         
         <Button 
-          onClick={handleNextMonth}
+          onClick={handleToday}
           variant="outline"
           size="sm"
           disabled={loading}
+          className="w-full sm:w-auto"
         >
-          下月 →
+          今天
         </Button>
       </div>
 

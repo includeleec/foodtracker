@@ -2,8 +2,11 @@
 
 import { useAuth } from '@/lib/auth-context'
 import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { MobileNav, BottomNav } from '@/components/ui/mobile-nav'
+import { PageLoading } from '@/components/ui/loading-spinner'
+import { Toast } from '@/components/ui/toast'
 import Link from 'next/link'
 
 interface DashboardLayoutProps {
@@ -14,6 +17,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const [signOutError, setSignOutError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -23,22 +27,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const handleSignOut = async () => {
     try {
+      setSignOutError(null)
       await signOut()
       router.push('/auth/login')
     } catch (error) {
       console.error('退出登录失败:', error)
+      setSignOutError('退出登录失败，请重试')
     }
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">加载中...</p>
-        </div>
-      </div>
-    )
+    return <PageLoading text="加载中..." />
   }
 
   if (!user) {
@@ -67,22 +66,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">
       {/* 顶部导航栏 */}
-      <header className="bg-white shadow">
+      <header className="bg-white shadow sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-3 md:py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">
                 每日食物记录
               </h1>
             </div>
             
-            {/* 用户信息和退出按钮 */}
-            <div className="flex items-center space-x-4">
-              <div className="hidden sm:block">
+            {/* 桌面端用户信息和退出按钮 */}
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="hidden lg:block">
                 <span className="text-sm text-gray-600">欢迎，</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-gray-900 max-w-32 truncate inline-block">
                   {user.email}
                 </span>
               </div>
@@ -94,12 +93,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 退出登录
               </Button>
             </div>
+
+            {/* 移动端菜单按钮 */}
+            <MobileNav
+              items={navigationItems}
+              userEmail={user.email}
+              onSignOut={handleSignOut}
+            />
           </div>
         </div>
       </header>
 
-      {/* 主导航 */}
-      <nav className="bg-white border-b border-gray-200">
+      {/* 桌面端主导航 */}
+      <nav className="hidden md:block bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {navigationItems.map((item) => (
@@ -123,11 +129,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </nav>
 
       {/* 主内容区域 */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 sm:px-0">
-          {children}
-        </div>
+      <main className="max-w-7xl mx-auto py-4 md:py-6 px-4 sm:px-6 lg:px-8">
+        {children}
       </main>
+
+      {/* 移动端底部导航 */}
+      <BottomNav items={navigationItems} />
+
+      {/* 错误提示 */}
+      {signOutError && (
+        <Toast
+          type="error"
+          message={signOutError}
+          onClose={() => setSignOutError(null)}
+        />
+      )}
     </div>
   )
 }

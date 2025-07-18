@@ -7,6 +7,8 @@ import { FoodRecordForm } from '@/components/food/food-record-form'
 import { FoodRecordsDisplay } from '@/components/food/food-records-display'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageLoading } from '@/components/ui/loading-spinner'
+import { Toast } from '@/components/ui/toast'
 import { getCurrentDate, formatRelativeDate } from '@/lib/date-utils'
 import { type FoodRecord, type FoodRecordFormData } from '@/types/database'
 import { cn } from '@/lib/utils'
@@ -20,7 +22,7 @@ interface ApiResponse<T> {
 export default function TodayPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  
+
   // 状态管理
   const [records, setRecords] = useState<FoodRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -28,6 +30,7 @@ export default function TodayPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingRecord, setEditingRecord] = useState<FoodRecord | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const today = getCurrentDate()
 
@@ -106,6 +109,7 @@ export default function TodayPage() {
         // 添加新记录到列表
         setRecords(prev => [...prev, result.data!])
         setShowForm(false)
+        setSuccessMessage('食物记录添加成功！')
       } else {
         throw new Error(result.error || '创建记录失败')
       }
@@ -141,13 +145,14 @@ export default function TodayPage() {
 
       if (result.success && result.data) {
         // 更新记录列表
-        setRecords(prev => 
-          prev.map(record => 
+        setRecords(prev =>
+          prev.map(record =>
             record.id === editingRecord.id ? result.data! : record
           )
         )
         setEditingRecord(null)
         setShowForm(false)
+        setSuccessMessage('食物记录更新成功！')
       } else {
         throw new Error(result.error || '更新记录失败')
       }
@@ -181,6 +186,7 @@ export default function TodayPage() {
       if (result.success) {
         // 从列表中移除记录
         setRecords(prev => prev.filter(r => r.id !== record.id))
+        setSuccessMessage('食物记录删除成功！')
       } else {
         throw new Error(result.error || '删除记录失败')
       }
@@ -207,14 +213,7 @@ export default function TodayPage() {
 
   // 加载状态
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">加载中...</p>
-        </div>
-      </div>
-    )
+    return <PageLoading text="加载今日记录..." />
   }
 
   // 未认证状态
@@ -223,44 +222,44 @@ export default function TodayPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 页面头部 */}
-      <div className="bg-white shadow">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {formatRelativeDate(today)}的记录
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                记录您今天的饮食情况
-              </p>
-            </div>
-            
-            {/* 总卡路里显示 */}
-            <div className="text-right">
-              <div className="text-3xl font-bold text-orange-600">
-                {totalCalories}
+    <>
+      <div className="space-y-4 md:space-y-6">
+        {/* 页面头部 - 响应式设计 */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-4 md:px-6 md:py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 truncate">
+                  {formatRelativeDate(today)}的记录
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  记录您今天的饮食情况
+                </p>
               </div>
-              <div className="text-sm text-gray-600">
-                总卡路里
+
+              {/* 总卡路里显示 - 响应式 */}
+              <div className="flex-shrink-0 text-center sm:text-right">
+                <div className="text-2xl md:text-3xl font-bold text-orange-600">
+                  {totalCalories}
+                </div>
+                <div className="text-sm text-gray-600">
+                  总卡路里
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 错误提示 */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
-            <div className="flex items-center justify-between">
-              <span>{error}</span>
+          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <span className="flex-1">{error}</span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={fetchTodayRecords}
-                className="ml-4"
+                className="w-full sm:w-auto"
               >
                 重试
               </Button>
@@ -268,7 +267,7 @@ export default function TodayPage() {
           </div>
         )}
 
-        <div className="space-y-8">
+        <div className="space-y-4 md:space-y-6">
           {/* 添加记录按钮 */}
           {!showForm && (
             <Card>
@@ -330,6 +329,15 @@ export default function TodayPage() {
           </Card>
         </div>
       </div>
-    </div>
+
+      {/* 成功提示 */}
+      {successMessage && (
+        <Toast
+          type="success"
+          message={successMessage}
+          onClose={() => setSuccessMessage(null)}
+        />
+      )}
+    </>
   )
 }
