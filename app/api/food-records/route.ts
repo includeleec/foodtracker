@@ -78,7 +78,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const userId = await validateUserAndGetId(request)
 
     // 获取请求体数据
-    const body = await request.json()
+    const body = await request.json() as any
     
     // 验证必填字段
     const requiredFields = ['meal_type', 'food_name', 'weight', 'calories', 'record_date']

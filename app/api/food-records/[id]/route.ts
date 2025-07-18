@@ -44,17 +44,20 @@ async function validateRecordOwnership(recordId: string, userId: string): Promis
 // PUT /api/food-records/[id] - 更新食物记录
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<FoodRecord>>> {
   try {
     // 验证用户身份
     const userId = await validateUserAndGetId(request)
     
+    // 获取参数
+    const { id } = await params
+    
     // 验证记录所有权
-    await validateRecordOwnership(params.id, userId)
+    await validateRecordOwnership(id, userId)
 
     // 获取请求体数据
-    const body = await request.json()
+    const body = await request.json() as any
     
     // 验证餐次类型（如果提供）
     if (body.meal_type) {
@@ -112,7 +115,7 @@ export async function PUT(
     if (body.image_id !== undefined) updateData.image_id = body.image_id
 
     // 更新食物记录
-    const updatedRecord = await FoodRecordService.updateFoodRecord(params.id, updateData)
+    const updatedRecord = await FoodRecordService.updateFoodRecord(id, updateData)
 
     return NextResponse.json({
       success: true,
@@ -136,17 +139,20 @@ export async function PUT(
 // DELETE /api/food-records/[id] - 删除食物记录
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<null>>> {
   try {
     // 验证用户身份
     const userId = await validateUserAndGetId(request)
     
+    // 获取参数
+    const { id } = await params
+    
     // 验证记录所有权
-    await validateRecordOwnership(params.id, userId)
+    await validateRecordOwnership(id, userId)
 
     // 删除食物记录
-    await FoodRecordService.deleteFoodRecord(params.id)
+    await FoodRecordService.deleteFoodRecord(id)
 
     return NextResponse.json({
       success: true,

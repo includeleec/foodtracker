@@ -140,7 +140,7 @@ export async function deleteImage(
       throw new ImageUploadError(`删除失败: ${response.status} ${response.statusText}`)
     }
 
-    const result = await response.json()
+    const result = await response.json() as any
     if (!result.success) {
       throw new ImageUploadError(result.error || '删除失败')
     }

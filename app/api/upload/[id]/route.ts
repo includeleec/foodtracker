@@ -50,7 +50,7 @@ async function deleteFromCloudflare(imageId: string): Promise<void> {
     throw new Error(`图片删除失败: ${response.status} ${response.statusText}`)
   }
 
-  const result = await response.json()
+  const result = await response.json() as any
   
   if (!result.success) {
     console.error('Cloudflare Images delete failed:', result.errors)
@@ -60,13 +60,13 @@ async function deleteFromCloudflare(imageId: string): Promise<void> {
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<DeleteResponse>> {
   try {
     // 验证用户身份
     await validateUser(request)
 
-    const imageId = params.id
+    const { id: imageId } = await params
     if (!imageId) {
       return NextResponse.json(
         { success: false, error: '缺少图片ID' },
