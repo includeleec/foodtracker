@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { FoodImage } from '@/components/ui/optimized-image'
 import { type FoodRecord } from '@/types/database'
 import { formatRelativeDate } from '@/lib/date-utils'
 import { cn } from '@/lib/utils'
@@ -61,17 +61,12 @@ export function FoodRecordCard({
       <div className="flex gap-4">
         {/* 食物图片 */}
         <div className="flex-shrink-0">
-          {record.image_url && !imageError ? (
-            <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
-              <Image
-                src={record.image_url}
-                alt={record.food_name}
-                fill
-                className="object-cover"
-                onError={handleImageError}
-                sizes="64px"
-              />
-            </div>
+          {record.image_url ? (
+            <FoodImage
+              src={record.image_url}
+              alt={record.food_name}
+              onError={handleImageError}
+            />
           ) : (
             <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
               <span className="text-2xl">🍽️</span>

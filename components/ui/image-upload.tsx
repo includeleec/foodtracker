@@ -236,11 +236,20 @@ export function ImageUpload({
         {/* 图片预览 */}
         {showPreview && (
           <div className="relative">
-            <img
-              src={uploadState.previewUrl || currentImageUrl}
-              alt="预览"
-              className="max-w-full max-h-48 mx-auto rounded-lg object-contain"
-            />
+            {uploadState.previewUrl ? (
+              <img
+                src={uploadState.previewUrl}
+                alt="预览"
+                className="max-w-full max-h-48 mx-auto rounded-lg object-contain"
+              />
+            ) : (
+              <img
+                src={currentImageUrl}
+                alt="预览"
+                className="max-w-full max-h-48 mx-auto rounded-lg object-contain"
+                loading="lazy"
+              />
+            )}
             
             {/* 删除按钮 */}
             {hasCurrentImage && !isLoading && (
