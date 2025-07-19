@@ -16,39 +16,45 @@ interface ApiResponse<T> {
 export function useFoodRecordsByDate(date: string) {
   const { user } = useAuth()
 
-  return useCachedData({
-    key: CacheKeys.foodRecords(date),
-    fetcher: async () => {
-      if (!user?.access_token) {
-        throw new Error('用户未登录')
+  // 稳定化 fetcher 函数
+  const fetcher = useCallback(async () => {
+    if (!user?.access_token) {
+      throw new Error('用户未登录')
+    }
+
+    return performanceMonitor.measureAsync('fetch_food_records', async () => {
+      const response = await fetch(`/api/food-records?date=${date}`, {
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result: ApiResponse<FoodRecord[]> = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '获取记录失败')
       }
 
-      return performanceMonitor.measureAsync('fetch_food_records', async () => {
-        const response = await fetch(`/api/food-records?date=${date}`, {
-          headers: {
-            'Authorization': `Bearer ${user.access_token}`,
-            'Content-Type': 'application/json',
-          },
-        })
+      if (!result.success || !result.data) {
+        throw new Error(result.error || '获取记录失败')
+      }
 
-        const result: ApiResponse<FoodRecord[]> = await response.json()
+      return result.data
+    })
+  }, [date, user?.access_token])
 
-        if (!response.ok) {
-          throw new Error(result.error || '获取记录失败')
-        }
+  // 稳定化 onError 函数
+  const onError = useCallback((error: Error) => {
+    console.error('Error fetching food records:', error)
+  }, [])
 
-        if (!result.success || !result.data) {
-          throw new Error(result.error || '获取记录失败')
-        }
-
-        return result.data
-      })
-    },
+  return useCachedData({
+    key: CacheKeys.foodRecords(date),
+    fetcher,
     ttl: 5 * 60 * 1000, // 5分钟缓存
     enabled: !!user?.access_token,
-    onError: (error) => {
-      console.error('Error fetching food records:', error)
-    }
+    onError
   })
 }
 
@@ -189,39 +195,45 @@ export function useFoodRecordsManager(date: string) {
 export function useRecordDates(startDate: string, endDate: string) {
   const { user } = useAuth()
 
-  return useCachedData({
-    key: CacheKeys.recordDates(startDate, endDate),
-    fetcher: async () => {
-      if (!user?.access_token) {
-        throw new Error('用户未登录')
+  // 稳定化 fetcher 函数
+  const fetcher = useCallback(async () => {
+    if (!user?.access_token) {
+      throw new Error('用户未登录')
+    }
+
+    return performanceMonitor.measureAsync('fetch_record_dates', async () => {
+      const response = await fetch(`/api/food-records/dates?start=${startDate}&end=${endDate}`, {
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result: ApiResponse<string[]> = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '获取记录日期失败')
       }
 
-      return performanceMonitor.measureAsync('fetch_record_dates', async () => {
-        const response = await fetch(`/api/food-records/dates?start=${startDate}&end=${endDate}`, {
-          headers: {
-            'Authorization': `Bearer ${user.access_token}`,
-            'Content-Type': 'application/json',
-          },
-        })
+      if (!result.success || !result.data) {
+        throw new Error(result.error || '获取记录日期失败')
+      }
 
-        const result: ApiResponse<string[]> = await response.json()
+      return result.data
+    })
+  }, [startDate, endDate, user?.access_token])
 
-        if (!response.ok) {
-          throw new Error(result.error || '获取记录日期失败')
-        }
+  // 稳定化 onError 函数
+  const onError = useCallback((error: Error) => {
+    console.error('Error fetching record dates:', error)
+  }, [])
 
-        if (!result.success || !result.data) {
-          throw new Error(result.error || '获取记录日期失败')
-        }
-
-        return result.data
-      })
-    },
+  return useCachedData({
+    key: CacheKeys.recordDates(startDate, endDate),
+    fetcher,
     ttl: 10 * 60 * 1000, // 10分钟缓存
     enabled: !!user?.access_token,
-    onError: (error) => {
-      console.error('Error fetching record dates:', error)
-    }
+    onError
   })
 }
 

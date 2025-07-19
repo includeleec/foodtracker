@@ -183,7 +183,7 @@ export function useCachedData<T>({
     } finally {
       setLoading(false)
     }
-  }, [key, fetcher, ttl, enabled, onSuccess, onError])
+  }, [key, ttl, enabled]) // 移除 fetcher, onSuccess, onError 从依赖数组
 
   // 手动刷新数据
   const refresh = useCallback(async () => {

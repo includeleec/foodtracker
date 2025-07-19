@@ -6,6 +6,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "food-tracker-app",
 	"main": ".open-next/worker.js",
+	"account_id": "b6f137a35efa5ef183ec1ff89f4e04ea",
 	"compatibility_date": "2025-03-01",
 	"compatibility_flags": [
 		"nodejs_compat",
@@ -17,6 +18,15 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	"vars": {
+		"NEXT_PUBLIC_SUPABASE_URL": "https://ypumartltoqsuovoabgw.supabase.co",
+		"NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwdW1hcnRsdG9xc3Vvdm9hYmd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MjcwNzYsImV4cCI6MjA2NTMwMzA3Nn0.vB0HKiS70FcQIW0wMPQ3prH-ofF5J4yWn-71cwDqcj0",
+		"SUPABASE_SERVICE_ROLE_KEY": "sb_secret_2LdMe4swq0HGthSVPVkDmg_7pCPXiF_",
+		"CLOUDFLARE_ACCOUNT_ID": "b6f137a35efa5ef183ec1ff89f4e04ea",
+		"CLOUDFLARE_ACCOUNT_HASH": "IuOTrPiYN-rxvLc0ZUziWg",
+		"CLOUDFLARE_IMAGES_TOKEN": "erYaEhB0dsqWDkWxQMEULJCPNSuj1zXBpninfznj",
+		"NEXT_PUBLIC_APP_URL": "https://food-tracker-app.includeleec-b6f.workers.dev"
 	}
 	/**
 	 * Smart Placement

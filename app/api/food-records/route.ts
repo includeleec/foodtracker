@@ -40,8 +40,9 @@ async function securityMiddleware(request: NextRequest): Promise<void> {
   // 验证请求来源
   const allowedOrigins = [
     process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    'https://*.pages.dev', // Cloudflare Pages
-    'https://*.workers.dev' // Cloudflare Workers
+    '*.pages.dev', // Cloudflare Pages
+    '*.workers.dev', // Cloudflare Workers
+    'https://food-tracker-app.includeleec-b6f.workers.dev' // 明确的生产域名
   ]
   
   if (!validateRequestOrigin(request, allowedOrigins)) {
@@ -345,14 +346,25 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 }
 
 // 处理 OPTIONS 请求 (CORS)
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin') || ''
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'https://food-tracker-app.includeleec-b6f.workers.dev'
+  ]
+  
+  // 动态设置 CORS origin
+  const corsOrigin = allowedOrigins.includes(origin) ? origin : 
+                    (allowedOrigins.find(allowed => origin.endsWith(allowed.replace('https://', '').replace('http://', ''))) || allowedOrigins[0])
+
   return new NextResponse(null, {
     status: 200,
     headers: {
       ...getSecurityHeaders(),
-      'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      'Access-Control-Allow-Origin': corsOrigin,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Max-Age': '86400', // 24 hours
     },
   })
