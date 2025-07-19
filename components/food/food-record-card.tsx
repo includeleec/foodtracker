@@ -65,7 +65,6 @@ export function FoodRecordCard({
             <FoodImage
               src={record.image_url}
               alt={record.food_name}
-              onError={handleImageError}
             />
           ) : (
             <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">

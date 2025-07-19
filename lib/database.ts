@@ -1,8 +1,9 @@
-import { supabase } from './supabase'
 import { apiCallWithRetry } from './retry-utils'
 import { handleError, CustomError, ERROR_CODES } from './error-utils'
 import { getServerCachedData, ServerCacheKeys, ServerCacheInvalidation } from './server-cache'
 import type { FoodRecord, FoodRecordInsert, FoodRecordUpdate } from '../types/database'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../types/database'
 
 // 分页查询选项
 interface PaginationOptions {
@@ -23,14 +24,20 @@ interface PaginatedResult<T> {
 
 // 食物记录数据库操作
 export class FoodRecordService {
+  readonly supabase: SupabaseClient<Database>
+
+  constructor(supabase: SupabaseClient<Database>) {
+    this.supabase = supabase
+  }
+
   // 获取指定日期的食物记录（带缓存）
-  static async getFoodRecordsByDate(date: string): Promise<FoodRecord[]> {
+  async getFoodRecordsByDate(date: string): Promise<FoodRecord[]> {
     return getServerCachedData(
       ServerCacheKeys.foodRecords(date),
       async () => {
         try {
           return await apiCallWithRetry(async () => {
-            const { data, error } = await supabase
+            const { data, error } = await this.supabase
               .from('food_records')
               .select('*')
               .eq('record_date', date)
@@ -52,7 +59,7 @@ export class FoodRecordService {
   }
 
   // 分页获取食物记录
-  static async getFoodRecordsPaginated(
+  async getFoodRecordsPaginated(
     options: PaginationOptions & { startDate?: string; endDate?: string } = {}
   ): Promise<PaginatedResult<FoodRecord>> {
     const {
@@ -66,7 +73,7 @@ export class FoodRecordService {
 
     try {
       return await apiCallWithRetry(async () => {
-        let query = supabase
+        let query = this.supabase
           .from('food_records')
           .select('*', { count: 'exact' })
 
@@ -107,10 +114,10 @@ export class FoodRecordService {
   }
 
   // 创建新的食物记录（带缓存失效）
-  static async createFoodRecord(record: FoodRecordInsert): Promise<FoodRecord> {
+  async createFoodRecord(record: FoodRecordInsert): Promise<FoodRecord> {
     try {
       const result = await apiCallWithRetry(async () => {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
           .from('food_records')
           .insert([record])
           .select()
@@ -135,10 +142,10 @@ export class FoodRecordService {
   }
 
   // 更新食物记录（带缓存失效）
-  static async updateFoodRecord(id: string, updates: FoodRecordUpdate): Promise<FoodRecord> {
+  async updateFoodRecord(id: string, updates: FoodRecordUpdate): Promise<FoodRecord> {
     try {
       const result = await apiCallWithRetry(async () => {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
           .from('food_records')
           .update(updates)
           .eq('id', id)
@@ -166,10 +173,10 @@ export class FoodRecordService {
   }
 
   // 删除食物记录（带缓存失效）
-  static async deleteFoodRecord(id: string, recordDate?: string): Promise<void> {
+  async deleteFoodRecord(id: string, recordDate?: string): Promise<void> {
     try {
       await apiCallWithRetry(async () => {
-        const { error } = await supabase
+        const { error } = await this.supabase
           .from('food_records')
           .delete()
           .eq('id', id)
@@ -191,13 +198,13 @@ export class FoodRecordService {
   }
 
   // 获取用户在指定日期范围内有记录的日期（带缓存）
-  static async getRecordDates(startDate: string, endDate: string): Promise<string[]> {
+  async getRecordDates(startDate: string, endDate: string): Promise<string[]> {
     return getServerCachedData(
       ServerCacheKeys.recordDates(startDate, endDate),
       async () => {
         try {
           return await apiCallWithRetry(async () => {
-            const { data, error } = await supabase
+            const { data, error } = await this.supabase
               .from('food_records')
               .select('record_date')
               .gte('record_date', startDate)
@@ -221,14 +228,14 @@ export class FoodRecordService {
   }
 
   // 批量获取多个日期的记录（优化版）
-  static async getFoodRecordsByDateRange(
+  async getFoodRecordsByDateRange(
     startDate: string,
     endDate: string,
     options: { groupByDate?: boolean } = {}
   ): Promise<FoodRecord[] | Record<string, FoodRecord[]>> {
     try {
       const records = await apiCallWithRetry(async () => {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
           .from('food_records')
           .select('*')
           .gte('record_date', startDate)
@@ -263,7 +270,7 @@ export class FoodRecordService {
   }
 
   // 获取统计信息（优化查询）
-  static async getRecordStats(startDate: string, endDate: string): Promise<{
+  async getRecordStats(startDate: string, endDate: string): Promise<{
     totalRecords: number
     totalCalories: number
     avgCaloriesPerDay: number
@@ -271,7 +278,7 @@ export class FoodRecordService {
   }> {
     try {
       return await apiCallWithRetry(async () => {
-        const { data, error } = await supabase
+        const { data, error } = await this.supabase
           .from('food_records')
           .select('calories, record_date')
           .gte('record_date', startDate)
@@ -304,11 +311,17 @@ export class FoodRecordService {
 
 // 认证相关操作
 export class AuthService {
+  readonly supabase: SupabaseClient<Database>
+
+  constructor(supabase: SupabaseClient<Database>) {
+    this.supabase = supabase
+  }
+
   // 获取当前用户
-  static async getCurrentUser() {
+  async getCurrentUser() {
     try {
       return await apiCallWithRetry(async () => {
-        const { data: { user }, error } = await supabase.auth.getUser()
+        const { data: { user }, error } = await this.supabase.auth.getUser()
         
         if (error) {
           throw new CustomError(ERROR_CODES.AUTH_ERROR, `获取用户信息失败: ${error.message}`, error)
@@ -323,10 +336,10 @@ export class AuthService {
   }
 
   // 用户注册
-  static async signUp(email: string, password: string) {
+  async signUp(email: string, password: string) {
     try {
       return await apiCallWithRetry(async () => {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await this.supabase.auth.signUp({
           email,
           password,
         })
@@ -344,10 +357,10 @@ export class AuthService {
   }
 
   // 用户登录
-  static async signIn(email: string, password: string) {
+  async signIn(email: string, password: string) {
     try {
       return await apiCallWithRetry(async () => {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await this.supabase.auth.signInWithPassword({
           email,
           password,
         })
@@ -365,10 +378,10 @@ export class AuthService {
   }
 
   // 用户登出
-  static async signOut() {
+  async signOut() {
     try {
       await apiCallWithRetry(async () => {
-        const { error } = await supabase.auth.signOut()
+        const { error } = await this.supabase.auth.signOut()
 
         if (error) {
           throw new CustomError(ERROR_CODES.AUTH_ERROR, `登出失败: ${error.message}`, error)

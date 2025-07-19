@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createAuthenticatedClient } from '@/lib/supabase-server'
 import { FoodRecordService } from '@/lib/database'
 import { handleError } from '@/lib/error-utils'
 
@@ -33,8 +34,30 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // 验证用户身份
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { success: false, error: '缺少认证信息' },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.substring(7)
+    const supabase = createAuthenticatedClient(token)
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error || !user) {
+      return NextResponse.json(
+        { success: false, error: '无效的认证令牌' },
+        { status: 401 }
+      )
+    }
+
+    const foodService = new FoodRecordService(supabase)
+    
     // 获取记录日期
-    const dates = await FoodRecordService.getRecordDates(startDate, endDate)
+    const dates = await foodService.getRecordDates(startDate, endDate)
 
     return NextResponse.json(
       { success: true, data: dates },

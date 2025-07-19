@@ -23,7 +23,7 @@ export function FormField({
   helpText 
 }: FormFieldProps) {
   const hasError = touched && error
-  const childId = children.props.id || children.props.name
+  const childId = React.isValidElement(children) ? (children.props as any).id || (children.props as any).name : undefined
 
   return (
     <div className={cn('space-y-1', className)}>
@@ -42,15 +42,17 @@ export function FormField({
       
       <div className="relative">
         {React.cloneElement(children, {
+          ...(children.props as any),
           className: cn(
-            children.props.className,
+            'border rounded-md shadow-sm w-full px-3 py-2 text-sm',
             hasError 
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
-              : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+              : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
+            (children.props as any).className
           ),
           'aria-invalid': hasError,
           'aria-describedby': hasError ? `${childId}-error` : helpText ? `${childId}-help` : undefined
-        })}
+        } as any)}
         
         {hasError && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

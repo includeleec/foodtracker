@@ -13,7 +13,7 @@ import {
   addDays,
   subtractDays
 } from '@/lib/date-utils'
-import { FoodRecordService } from '@/lib/database'
+import { ClientFoodRecordService } from '@/lib/client-api'
 import type { CalendarDay as CalendarDayType } from '@/types/database'
 
 interface FoodCalendarProps {
@@ -49,7 +49,7 @@ export function FoodCalendar({ selectedDate, onDateSelect, className = '' }: Foo
       const endDate = formatDate(monthDays[monthDays.length - 1], 'iso')
       
       // 获取有记录的日期
-      const recordDates = await FoodRecordService.getRecordDates(startDate, endDate)
+      const recordDates = await ClientFoodRecordService.getRecordDates(startDate, endDate)
       const recordDateSet = new Set(recordDates)
 
       // 构建日历数据

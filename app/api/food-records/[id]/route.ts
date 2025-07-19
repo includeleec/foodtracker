@@ -1,43 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createAuthenticatedClient } from '@/lib/supabase-server'
 import { FoodRecordService } from '@/lib/database'
 import type { FoodRecordUpdate, ApiResponse, FoodRecord } from '@/types/database'
 
-// 验证用户身份并获取用户ID
-async function validateUserAndGetId(request: NextRequest): Promise<string> {
-  const supabase = createServerSupabaseClient()
-  
+// 验证用户身份并获取用户ID和认证客户端
+async function validateUserAndGetClient(request: NextRequest): Promise<{ userId: string, foodService: FoodRecordService }> {
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     throw new Error('Missing or invalid authorization header')
   }
 
   const token = authHeader.substring(7)
-  const { data: { user }, error } = await supabase.auth.getUser(token)
+  const supabase = createAuthenticatedClient(token)
+  const { data: { user }, error } = await supabase.auth.getUser()
   
   if (error || !user) {
     throw new Error('Invalid authentication token')
   }
 
-  return user.id
+  return { userId: user.id, foodService: new FoodRecordService(supabase) }
 }
 
 // 验证记录所有权
-async function validateRecordOwnership(recordId: string, userId: string): Promise<void> {
-  const supabase = createServerSupabaseClient()
-  
-  const { data: record, error } = await supabase
-    .from('food_records')
-    .select('user_id')
-    .eq('id', recordId)
-    .single()
+async function validateRecordOwnership(recordId: string, userId: string, foodService: FoodRecordService): Promise<void> {
+  try {
+    const { data: record, error } = await foodService.supabase
+      .from('food_records')
+      .select('user_id')
+      .eq('id', recordId)
+      .single()
+    
+    if (error || !record) {
+      throw new Error('记录不存在')
+    }
 
-  if (error) {
+    if (record.user_id !== userId) {
+      throw new Error('无权限访问此记录')
+    }
+  } catch (error) {
     throw new Error('记录不存在')
-  }
-
-  if (record.user_id !== userId) {
-    throw new Error('无权限访问此记录')
   }
 }
 
@@ -47,14 +48,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<FoodRecord>>> {
   try {
-    // 验证用户身份
-    const userId = await validateUserAndGetId(request)
+    // 验证用户身份并获取服务
+    const { userId, foodService } = await validateUserAndGetClient(request)
     
     // 获取参数
     const { id } = await params
     
     // 验证记录所有权
-    await validateRecordOwnership(id, userId)
+    await validateRecordOwnership(id, userId, foodService)
 
     // 获取请求体数据
     const body = await request.json() as any
@@ -115,7 +116,7 @@ export async function PUT(
     if (body.image_id !== undefined) updateData.image_id = body.image_id
 
     // 更新食物记录
-    const updatedRecord = await FoodRecordService.updateFoodRecord(id, updateData)
+    const updatedRecord = await foodService.updateFoodRecord(id, updateData)
 
     return NextResponse.json({
       success: true,
@@ -142,17 +143,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    // 验证用户身份
-    const userId = await validateUserAndGetId(request)
+    // 验证用户身份并获取服务
+    const { userId, foodService } = await validateUserAndGetClient(request)
     
     // 获取参数
     const { id } = await params
     
     // 验证记录所有权
-    await validateRecordOwnership(id, userId)
+    await validateRecordOwnership(id, userId, foodService)
 
     // 删除食物记录
-    await FoodRecordService.deleteFoodRecord(id)
+    await foodService.deleteFoodRecord(id)
 
     return NextResponse.json({
       success: true,

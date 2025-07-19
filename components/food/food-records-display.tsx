@@ -153,13 +153,13 @@ export function FoodRecordsDisplay({
       {/* 删除确认对话框 */}
       <ConfirmDialog
         isOpen={deleteDialog.isOpen}
-        onClose={handleDeleteCancel}
+        onCancel={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="删除食物记录"
         message={`确定要删除"${deleteDialog.record?.food_name}"的记录吗？此操作无法撤销。`}
         confirmText="删除"
         cancelText="取消"
-        variant="danger"
+        type="danger"
         isLoading={deleteDialog.isLoading}
       />
     </div>

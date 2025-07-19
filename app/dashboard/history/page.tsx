@@ -6,7 +6,7 @@ import { FoodRecordsDisplay } from '@/components/food'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ContentLoading } from '@/components/ui/loading-spinner'
-import { FoodRecordService } from '@/lib/database'
+import { ClientFoodRecordService } from '@/lib/client-api'
 import { getCurrentDate, formatDateWithWeekday } from '@/lib/date-utils'
 import type { FoodRecord } from '@/types/database'
 
@@ -26,7 +26,7 @@ export default function HistoryPage() {
       setLoading(true)
       setError(null)
       
-      const dayRecords = await FoodRecordService.getFoodRecordsByDate(date)
+      const dayRecords = await ClientFoodRecordService.getFoodRecordsByDate(date)
       setRecords(dayRecords)
     } catch (err) {
       console.error('加载历史记录失败:', err)
@@ -98,9 +98,6 @@ export default function HistoryPage() {
                 {records.length > 0 ? (
                   <FoodRecordsDisplay
                     records={records}
-                    onEdit={() => {}} // 历史记录页面不支持编辑
-                    onDelete={() => {}} // 历史记录页面不支持删除
-                    showActions={false} // 隐藏操作按钮
                   />
                 ) : (
                   <div className="text-center py-12">

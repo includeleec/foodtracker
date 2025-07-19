@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getConfig } from '@/lib/config'
-import { createClient } from '@supabase/supabase-js'
+import { createAuthenticatedClient } from '@/lib/supabase-server'
 import { 
   validateRequestOrigin, 
   checkRateLimit, 
@@ -39,12 +39,6 @@ interface UploadResponse {
 
 // 验证用户身份
 async function validateUser(request: NextRequest) {
-  const config = getConfig()
-  const supabase = createClient(
-    config.supabase.url,
-    config.supabase.serviceRoleKey || config.supabase.anonKey
-  )
-
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     throw new Error('Missing or invalid authorization header')
@@ -57,7 +51,8 @@ async function validateUser(request: NextRequest) {
     throw new Error('Invalid JWT format')
   }
   
-  const { data: { user }, error } = await supabase.auth.getUser(token)
+  const supabase = createAuthenticatedClient(token)
+  const { data: { user }, error } = await supabase.auth.getUser()
   
   if (error || !user) {
     throw new Error('Invalid authentication token')

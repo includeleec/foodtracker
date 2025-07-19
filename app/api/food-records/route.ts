@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createAuthenticatedClient } from '@/lib/supabase-server'
 import { FoodRecordService } from '@/lib/database'
 import type { FoodRecordInsert, ApiResponse, FoodRecord } from '@/types/database'
 import { 
@@ -11,10 +11,8 @@ import {
   validateJwtFormat
 } from '@/lib/security-utils'
 
-// 验证用户身份并获取用户ID
-async function validateUserAndGetId(request: NextRequest): Promise<string> {
-  const supabase = createServerSupabaseClient()
-  
+// 验证用户身份并获取用户ID和认证客户端
+async function validateUserAndGetClient(request: NextRequest): Promise<{ userId: string, foodService: FoodRecordService }> {
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     throw new Error('Missing or invalid authorization header')
@@ -27,13 +25,14 @@ async function validateUserAndGetId(request: NextRequest): Promise<string> {
     throw new Error('Invalid JWT format')
   }
   
-  const { data: { user }, error } = await supabase.auth.getUser(token)
+  const supabase = createAuthenticatedClient(token)
+  const { data: { user }, error } = await supabase.auth.getUser()
   
   if (error || !user) {
     throw new Error('Invalid authentication token')
   }
 
-  return user.id
+  return { userId: user.id, foodService: new FoodRecordService(supabase) }
 }
 
 // 安全验证中间件
@@ -73,8 +72,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     // 安全验证
     await securityMiddleware(request)
     
-    // 验证用户身份
-    const userId = await validateUserAndGetId(request)
+    // 验证用户身份并获取服务
+    const { userId, foodService } = await validateUserAndGetClient(request)
 
     // 获取查询参数
     const { searchParams } = new URL(request.url)
@@ -131,7 +130,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     }
 
     // 获取指定日期的食物记录
-    const records = await FoodRecordService.getFoodRecordsByDate(cleanDate)
+    const records = await foodService.getFoodRecordsByDate(cleanDate)
     
     // 过滤只返回当前用户的记录（双重验证）
     const userRecords = records.filter(record => record.user_id === userId)
@@ -166,8 +165,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     // 安全验证
     await securityMiddleware(request)
     
-    // 验证用户身份
-    const userId = await validateUserAndGetId(request)
+    // 验证用户身份并获取服务
+    const { userId, foodService } = await validateUserAndGetClient(request)
 
     // 获取请求体数据
     const body = await request.json() as any
@@ -319,7 +318,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     // 创建食物记录
-    const newRecord = await FoodRecordService.createFoodRecord(insertData)
+    const newRecord = await foodService.createFoodRecord(insertData)
 
     return NextResponse.json({
       success: true,

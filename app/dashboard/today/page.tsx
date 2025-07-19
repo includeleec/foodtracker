@@ -160,7 +160,7 @@ export default function TodayPage() {
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <span className="flex-1">{error.message || error}</span>
+              <span className="flex-1">{error instanceof Error ? error.message : String(error)}</span>
               <Button
                 variant="outline"
                 size="sm"

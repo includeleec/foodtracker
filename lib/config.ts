@@ -8,6 +8,7 @@ interface Config {
   }
   cloudflare: {
     accountId: string
+    accountHash: string
     imagesToken: string
   }
 }

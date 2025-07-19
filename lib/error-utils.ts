@@ -236,7 +236,7 @@ export function isRetryableError(error: any): boolean {
     ERROR_CODES.SERVER_ERROR
   ]
   
-  return retryableCodes.includes(appError.code)
+  return retryableCodes.includes(appError.code as any)
 }
 
 // 错误报告函数（可以集成第三方服务）
