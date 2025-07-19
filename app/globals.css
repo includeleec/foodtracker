@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --background: #EAEAFD;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  --font-mono: 'SF Mono', Monaco, Inconsolata, 'Liberation Mono', 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1a2e;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* 设计系统工具类 */
+.bg-primary { background-color: #F27BA9; }
+.text-primary { color: #F27BA9; }
+.bg-primary-dark { background-color: #e16b97; }
+.text-primary-foreground { color: #ffffff; }
+.bg-surface { background-color: #ffffff; }
+.text-accent-calories { color: #F6B74A; }
+.text-accent-success { color: #22c55e; }
+.text-accent-warning { color: #f59e0b; }
+.text-accent-error { color: #ef4444; }
+
+/* 餐次类型样式 */
+.bg-breakfast-bg { background-color: #fff7ed; }
+.border-breakfast-border { border-color: #fed7aa; }
+.text-breakfast-text { color: #ea580c; }
+
+.bg-lunch-bg { background-color: #fefce8; }
+.border-lunch-border { border-color: #fde047; }
+.text-lunch-text { color: #ca8a04; }
+
+.bg-dinner-bg { background-color: #eff6ff; }
+.border-dinner-border { border-color: #93c5fd; }
+.text-dinner-text { color: #2563eb; }
+
+.bg-snack-bg { background-color: #f0fdf4; }
+.border-snack-border { border-color: #86efac; }
+.text-snack-text { color: #16a34a; }
+
+/* 圆角系统 */
+.rounded-card { border-radius: 24px; }
+.rounded-button { border-radius: 20px; }
+.rounded-input { border-radius: 16px; }
+
+/* 触摸友好尺寸 */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.touch-comfortable {
+  min-height: 48px;
+}
+
+/* 动画 */
+.animate-spring {
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* FAB 阴影 */
+.shadow-fab {
+  box-shadow: 0 8px 16px 0 rgb(242 123 169 / 0.24);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  button, 
+  [role="button"], 
+  input[type="submit"], 
+  input[type="button"] {
+    touch-action: manipulation;
+  }
+}
