@@ -10,6 +10,9 @@
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:debug": "playwright test --debug",
 		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
@@ -40,6 +43,7 @@
 		"@types/react-dom": "^19",
 		"jest": "^30.0.4",
 		"jest-environment-jsdom": "^30.0.4",
+		"playwright": "^1.54.1",
 		"tailwindcss": "^4",
 		"ts-jest": "^29.4.0",
 		"typescript": "^5",

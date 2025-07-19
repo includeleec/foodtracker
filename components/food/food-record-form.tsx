@@ -79,17 +79,17 @@ export function FoodRecordForm({
   // 初始化表单数据
   useEffect(() => {
     if (initialData) {
-      setFormData({
-        meal_type: initialData.meal_type || '',
-        food_name: initialData.food_name || '',
-        weight: initialData.weight?.toString() || '',
-        calories: initialData.calories?.toString() || '',
-        image_url: initialData.image_url || '',
-        image_id: initialData.image_id || '',
-        record_date: initialData.record_date || new Date().toISOString().split('T')[0]
-      })
+      setFormData(prev => ({
+        meal_type: initialData.meal_type || prev.meal_type || '',
+        food_name: initialData.food_name || prev.food_name || '',
+        weight: initialData.weight?.toString() || prev.weight || '',
+        calories: initialData.calories?.toString() || prev.calories || '',
+        image_url: initialData.image_url || prev.image_url || '',
+        image_id: initialData.image_id || prev.image_id || '',
+        record_date: initialData.record_date || prev.record_date || new Date().toISOString().split('T')[0]
+      }))
     }
-  }, [initialData])
+  }, [initialData?.id, initialData?.meal_type, initialData?.food_name, initialData?.weight, initialData?.calories, initialData?.image_url, initialData?.image_id, initialData?.record_date])
 
   // 处理输入变化
   const handleInputChange = (field: keyof FormState, value: string) => {
@@ -207,6 +207,7 @@ export function FoodRecordForm({
           calories: '',
           image_url: '',
           image_id: ''
+          // 保留 record_date 不被重置
         }))
       }
 

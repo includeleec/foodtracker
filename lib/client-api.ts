@@ -1,16 +1,25 @@
 import type { FoodRecord, FoodRecordInsert, FoodRecordUpdate } from '../types/database'
+import { supabase } from './supabase'
 
 // 客户端API服务
 export class ClientFoodRecordService {
-  private static getAuthToken(): string {
-    // 从localStorage或sessionStorage获取token，或者从全局变量
-    // 这里简化处理，实际应该从auth上下文获取
-    const token = localStorage.getItem('auth_token') || ''
-    return token
+  private static async getAuthToken(): Promise<string> {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      return session?.access_token || ''
+    } catch (error) {
+      console.error('Error getting auth token:', error)
+      return ''
+    }
   }
 
   private static async makeRequest(url: string, options: RequestInit = {}) {
-    const token = this.getAuthToken()
+    const token = await this.getAuthToken()
+    
+    if (!token) {
+      throw new Error('缺少认证信息')
+    }
+    
     const response = await fetch(url, {
       ...options,
       headers: {

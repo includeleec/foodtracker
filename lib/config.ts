@@ -28,6 +28,7 @@ export function getConfig(): Config {
     },
     cloudflare: {
       accountId: validateEnvVar('CLOUDFLARE_ACCOUNT_ID', process.env.CLOUDFLARE_ACCOUNT_ID),
+      accountHash: validateEnvVar('CLOUDFLARE_ACCOUNT_HASH', process.env.CLOUDFLARE_ACCOUNT_HASH),
       imagesToken: validateEnvVar('CLOUDFLARE_IMAGES_TOKEN', process.env.CLOUDFLARE_IMAGES_TOKEN),
     }
   }
@@ -60,7 +61,7 @@ export function validateConfig(): boolean {
     }
 
     // 检查 Cloudflare Images 配置
-    if (!config.cloudflare.accountId || !config.cloudflare.imagesToken) {
+    if (!config.cloudflare.accountId || !config.cloudflare.accountHash || !config.cloudflare.imagesToken) {
       console.error('Cloudflare Images configuration is incomplete')
       return false
     }

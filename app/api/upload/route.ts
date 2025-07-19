@@ -194,7 +194,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
     const uploadResult = await uploadToCloudflare(file)
 
     // 构建图片 URL
-    const imageUrl = `https://imagedelivery.net/${getConfig().cloudflare.accountId}/${uploadResult.result.id}/public`
+    const imageUrl = `https://imagedelivery.net/${getConfig().cloudflare.accountHash}/${uploadResult.result.id}/public`
 
     return NextResponse.json({
       success: true,
