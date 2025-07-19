@@ -66,31 +66,42 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">
-      {/* 顶部导航栏 */}
-      <header className="bg-white shadow sticky top-0 z-30">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
+      {/* 顶部导航栏 - 新设计 */}
+      <header className="bg-surface shadow-sm border-b border-gray-200/50 sticky top-0 z-30 backdrop-blur-xl bg-white/95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3 md:py-4">
-            <div className="flex items-center">
-              <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-button flex items-center justify-center">
+                <span className="text-white font-bold text-sm">🍽️</span>
+              </div>
+              <h1 className="text-lg md:text-2xl font-bold text-foreground">
                 每日食物记录
               </h1>
             </div>
             
             {/* 桌面端用户信息和退出按钮 */}
             <div className="hidden md:flex items-center space-x-4">
-              <div className="hidden lg:block">
-                <span className="text-sm text-gray-600">欢迎，</span>
-                <span className="text-sm font-medium text-gray-900 max-w-32 truncate inline-block">
-                  {user.email}
-                </span>
+              <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-background rounded-button">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-medium text-sm">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">欢迎回来</div>
+                  <div className="text-sm font-medium text-foreground max-w-32 truncate">
+                    {user.email}
+                  </div>
+                </div>
               </div>
               <Button
                 onClick={handleSignOut}
                 variant="outline"
                 size="sm"
+                className="rounded-button"
               >
-                退出登录
+                👋 退出登录
               </Button>
             </div>
 
@@ -104,24 +115,27 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </header>
 
-      {/* 桌面端主导航 */}
-      <nav className="hidden md:block bg-white border-b border-gray-200">
+      {/* 桌面端主导航 - 新设计 */}
+      <nav className="hidden md:block bg-surface border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
+          <div className="flex space-x-2">
             {navigationItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
                 className={`
-                  flex items-center px-1 py-4 text-sm font-medium border-b-2 transition-colors
+                  flex items-center px-4 py-3 text-sm font-medium rounded-button transition-all duration-200 animate-spring
                   ${item.current
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-gray-600 hover:text-foreground hover:bg-gray-100 active:scale-95'
                   }
                 `}
               >
-                <span className="mr-2">{item.icon}</span>
+                <span className="mr-2 text-base">{item.icon}</span>
                 {item.name}
+                {item.current && (
+                  <div className="ml-2 w-2 h-2 bg-primary-foreground rounded-full" />
+                )}
               </Link>
             ))}
           </div>
@@ -129,11 +143,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </nav>
 
       {/* 主内容区域 */}
-      <main className="max-w-7xl mx-auto py-4 md:py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
 
-      {/* 移动端底部导航 */}
+      {/* 移动端底部导航 - 使用新设计 */}
       <BottomNav items={navigationItems} />
 
       {/* 错误提示 */}

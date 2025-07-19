@@ -163,8 +163,9 @@ export function useCachedData<T>({
   onError
 }: UseCachedDataOptions<T>) {
   const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const [mounted, setMounted] = useState(false)
 
   const fetchData = useCallback(async () => {
     if (!enabled) return
@@ -183,7 +184,7 @@ export function useCachedData<T>({
     } finally {
       setLoading(false)
     }
-  }, [key, ttl, enabled]) // 移除 fetcher, onSuccess, onError 从依赖数组
+  }, [key, ttl, enabled]) // Remove function dependencies to avoid infinite re-renders
 
   // 手动刷新数据
   const refresh = useCallback(async () => {
@@ -191,14 +192,21 @@ export function useCachedData<T>({
     await fetchData()
   }, [key, fetchData])
 
-  // 初始加载
+  // 确保组件已挂载
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    setMounted(true)
+  }, [])
+
+  // 初始加载和参数变化时重新获取
+  useEffect(() => {
+    if (mounted) {
+      fetchData()
+    }
+  }, [fetchData, mounted, key, ttl, enabled])
 
   return {
     data,
-    loading,
+    loading: !mounted || loading,
     error,
     refresh
   }

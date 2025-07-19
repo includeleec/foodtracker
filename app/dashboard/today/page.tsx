@@ -2,106 +2,100 @@
 
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useRouter } from 'next/navigation'
 import { FoodRecordForm } from '@/components/food/food-record-form'
 import { FoodRecordsDisplay } from '@/components/food/food-records-display'
-import { Button } from '@/components/ui/button'
+import { Button, FAB } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageLoading } from '@/components/ui/loading-spinner'
 import { Toast } from '@/components/ui/toast'
+import { CaloriesDisplay, StatsCard } from '@/components/ui/number-display'
 import { getCurrentDate, formatRelativeDate } from '@/lib/date-utils'
-import { useFoodRecordsManager, useDataPreloader } from '@/hooks/use-food-records'
-import { usePerformanceMonitoring } from '@/lib/performance-utils'
+import { ClientFoodRecordService } from '@/lib/client-api'
 import { type FoodRecord, type FoodRecordFormData } from '@/types/database'
 
 export default function TodayPage() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
+  const { user } = useAuth()
   const today = getCurrentDate()
 
-  // 使用优化的数据管理 Hook
-  const {
-    records,
-    loading: recordsLoading,
-    error,
-    isSubmitting,
-    totalCalories,
-    createRecord,
-    updateRecord,
-    deleteRecord,
-    refresh
-  } = useFoodRecordsManager(today)
-
-  // 性能监控
-  const { recordMetric } = usePerformanceMonitoring()
-
-  // 数据预加载
-  const { preloadTodayRecords, preloadRecentDates } = useDataPreloader()
-
-  // 状态管理
+  // Simplified state management without complex hooks for now
+  const [records, setRecords] = useState<FoodRecord[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingRecord, setEditingRecord] = useState<FoodRecord | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  // 重定向未认证用户
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth/login')
-    }
-  }, [user, loading, router])
-
-  // 预加载数据
+  // Load today's records
   useEffect(() => {
     if (user?.access_token) {
-      preloadTodayRecords()
-      preloadRecentDates()
+      loadTodayRecords()
     }
-  }, [user?.access_token, preloadTodayRecords, preloadRecentDates])
+  }, [user?.access_token])
 
-  // 创建新记录
-  const handleCreateRecord = async (formData: FoodRecordFormData) => {
+  const loadTodayRecords = async () => {
     try {
-      recordMetric('form_submit_start', 1, 'counter')
-      await createRecord(formData)
-      setShowForm(false)
-      setSuccessMessage('食物记录添加成功！')
-      recordMetric('form_submit_success', 1, 'counter')
+      setLoading(true)
+      setError(null)
+      
+      const todayRecords = await ClientFoodRecordService.getFoodRecordsByDate(today)
+      setRecords(todayRecords)
     } catch (err) {
-      recordMetric('form_submit_error', 1, 'counter')
-      const errorMessage = err instanceof Error ? err.message : '创建记录失败'
-      throw new Error(errorMessage)
+      console.error('加载今日记录失败:', err)
+      setError(err instanceof Error ? err : new Error('加载今日记录失败'))
+    } finally {
+      setLoading(false)
     }
   }
 
-  // 更新记录
+  // Real handlers with API calls
+  const handleCreateRecord = async (formData: FoodRecordFormData) => {
+    if (!user?.id) {
+      setError(new Error('用户未登录'))
+      return
+    }
+    
+    try {
+      // Add user_id to form data to match FoodRecordInsert type
+      const recordData = {
+        ...formData,
+        user_id: user.id
+      }
+      await ClientFoodRecordService.createFoodRecord(recordData)
+      setSuccessMessage('食物记录添加成功！')
+      setShowForm(false)
+      // Reload records to show the new one
+      await loadTodayRecords()
+    } catch (err) {
+      console.error('创建记录失败:', err)
+      setError(err instanceof Error ? err : new Error('创建记录失败'))
+    }
+  }
+
   const handleUpdateRecord = async (formData: FoodRecordFormData) => {
     if (!editingRecord) return
-
+    
     try {
-      recordMetric('form_update_start', 1, 'counter')
-      await updateRecord(editingRecord.id, formData)
+      await ClientFoodRecordService.updateFoodRecord(editingRecord.id, formData)
+      setSuccessMessage('食物记录更新成功！')
       setEditingRecord(null)
       setShowForm(false)
-      setSuccessMessage('食物记录更新成功！')
-      recordMetric('form_update_success', 1, 'counter')
+      // Reload records to show the updated one
+      await loadTodayRecords()
     } catch (err) {
-      recordMetric('form_update_error', 1, 'counter')
-      const errorMessage = err instanceof Error ? err.message : '更新记录失败'
-      throw new Error(errorMessage)
+      console.error('更新记录失败:', err)
+      setError(err instanceof Error ? err : new Error('更新记录失败'))
     }
   }
 
-  // 删除记录
   const handleDeleteRecord = async (record: FoodRecord) => {
     try {
-      recordMetric('record_delete_start', 1, 'counter')
-      await deleteRecord(record)
+      await ClientFoodRecordService.deleteFoodRecord(record.id)
       setSuccessMessage('食物记录删除成功！')
-      recordMetric('record_delete_success', 1, 'counter')
+      // Reload records to remove the deleted one
+      await loadTodayRecords()
     } catch (err) {
-      recordMetric('record_delete_error', 1, 'counter')
-      const errorMessage = err instanceof Error ? err.message : '删除记录失败'
-      throw new Error(errorMessage)
+      console.error('删除记录失败:', err)
+      setError(err instanceof Error ? err : new Error('删除记录失败'))
     }
   }
 
@@ -117,124 +111,200 @@ export default function TodayPage() {
     setEditingRecord(null)
   }
 
-  // 加载状态
-  if (loading || recordsLoading) {
-    return <PageLoading text="加载今日记录..." />
+  // 重试加载
+  const handleRetry = () => {
+    loadTodayRecords()
   }
 
-  // 未认证状态
-  if (!user) {
-    return null
+  // 计算统计数据
+  const mealStats = React.useMemo(() => {
+    const stats = {
+      breakfast: { count: 0, calories: 0 },
+      lunch: { count: 0, calories: 0 },
+      dinner: { count: 0, calories: 0 },
+      snack: { count: 0, calories: 0 }
+    }
+    
+    if (records) {
+      records.forEach(record => {
+        const mealType = record.meal_type as keyof typeof stats
+        if (stats[mealType]) {
+          stats[mealType].count++
+          stats[mealType].calories += record.calories || 0
+        }
+      })
+    }
+    
+    return stats
+  }, [records])
+
+  // Calculate total calories
+  const totalCalories = records.reduce((sum, record) => sum + record.calories, 0)
+
+  // 只处理数据加载状态，认证已在layout处理
+  if (loading) {
+    return <PageLoading text="加载今日记录..." />
   }
 
   return (
     <>
-      <div className="space-y-4 md:space-y-6">
-        {/* 页面头部 - 响应式设计 */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-4 md:px-6 md:py-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900 truncate">
-                  {formatRelativeDate(today)}的记录
+      <div className="space-y-6">
+        {/* 页面头部 - 新设计 */}
+        <Card variant="elevated" className="bg-gradient-to-br from-background to-primary/5">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  {formatRelativeDate(today)}
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  记录您今天的饮食情况
+                <p className="text-gray-600">
+                  📊 记录您今天的饮食情况，保持健康生活
                 </p>
               </div>
 
-              {/* 总卡路里显示 - 响应式 */}
-              <div className="flex-shrink-0 text-center sm:text-right">
-                <div className="text-2xl md:text-3xl font-bold text-orange-600">
-                  {totalCalories}
-                </div>
-                <div className="text-sm text-gray-600">
-                  总卡路里
-                </div>
+              {/* 热量显示 - 使用新组件 */}
+              <div className="flex-shrink-0">
+                <CaloriesDisplay 
+                  calories={totalCalories} 
+                  size="3xl"
+                  animated={true}
+                  className="text-center"
+                />
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
+
+        {/* 餐次统计概览 */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="早餐"
+            value={mealStats.breakfast.calories}
+            unit="卡"
+            icon="🌅"
+            type="calories"
+            trend={{
+              value: mealStats.breakfast.count,
+              type: 'neutral',
+              period: `${mealStats.breakfast.count}项记录`
+            }}
+          />
+          <StatsCard
+            title="中餐"
+            value={mealStats.lunch.calories}
+            unit="卡"
+            icon="☀️"
+            type="calories"
+            trend={{
+              value: mealStats.lunch.count,
+              type: 'neutral',
+              period: `${mealStats.lunch.count}项记录`
+            }}
+          />
+          <StatsCard
+            title="晚餐"
+            value={mealStats.dinner.calories}
+            unit="卡"
+            icon="🌙"
+            type="calories"
+            trend={{
+              value: mealStats.dinner.count,
+              type: 'neutral',
+              period: `${mealStats.dinner.count}项记录`
+            }}
+          />
+          <StatsCard
+            title="加餐"
+            value={mealStats.snack.calories}
+            unit="卡"
+            icon="🍎"
+            type="calories"
+            trend={{
+              value: mealStats.snack.count,
+              type: 'neutral',
+              period: `${mealStats.snack.count}项记录`
+            }}
+          />
         </div>
 
-        {/* 错误提示 */}
+        {/* 错误提示 - 新设计 */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <span className="flex-1">{error instanceof Error ? error.message : String(error)}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={refresh}
-                className="w-full sm:w-auto"
-              >
-                重试
-              </Button>
-            </div>
-          </div>
+          <Card className="border-accent-error bg-red-50">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-2 text-accent-error">
+                  <span>⚠️</span>
+                  <span className="flex-1">{error instanceof Error ? error.message : String(error)}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRetry}
+                  className="w-full sm:w-auto border-accent-error text-accent-error hover:bg-accent-error hover:text-white"
+                >
+                  重试
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
-        <div className="space-y-4 md:space-y-6">
-          {/* 添加记录按钮 */}
-          {!showForm && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <Button
-                    onClick={() => setShowForm(true)}
-                    size="lg"
-                    className="w-full sm:w-auto"
-                  >
-                    ➕ 添加食物记录
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* 食物记录表单 */}
-          {showForm && (
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {editingRecord ? '编辑食物记录' : '添加食物记录'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FoodRecordForm
-                  onSubmit={editingRecord ? handleUpdateRecord : handleCreateRecord}
-                  onCancel={handleCancel}
-                  initialData={editingRecord || { record_date: today }}
-                  isEditing={!!editingRecord}
-                  disabled={isSubmitting}
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* 今日记录显示 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>今日记录</span>
-                {records.length > 0 && (
-                  <span className="text-sm font-normal text-gray-600">
-                    共 {records.length} 项记录
-                  </span>
-                )}
+        {/* 食物记录表单 */}
+        {showForm && (
+          <Card variant="elevated" className="border-primary/20">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent">
+              <CardTitle className="flex items-center gap-2">
+                <span>{editingRecord ? '✏️' : '➕'}</span>
+                {editingRecord ? '编辑食物记录' : '添加食物记录'}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <FoodRecordsDisplay
-                records={records}
-                date={today}
-                onEditRecord={handleEditRecord}
-                onDeleteRecord={handleDeleteRecord}
-                showDate={false}
+            <CardContent className="p-6">
+              <FoodRecordForm
+                onSubmit={editingRecord ? handleUpdateRecord : handleCreateRecord}
+                onCancel={handleCancel}
+                initialData={editingRecord || { record_date: today }}
+                isEditing={!!editingRecord}
+                disabled={false}
               />
             </CardContent>
           </Card>
-        </div>
+        )}
+
+        {/* 今日记录显示 */}
+        <Card variant="interactive">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span>📝</span>
+                <span>今日记录</span>
+              </div>
+              {records.length > 0 && (
+                <span className="text-sm font-normal text-gray-600 bg-gray-100 px-3 py-1 rounded-button">
+                  {records.length} 项记录
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FoodRecordsDisplay
+              records={records}
+              date={today}
+              onEditRecord={handleEditRecord}
+              onDeleteRecord={handleDeleteRecord}
+              showDate={false}
+            />
+          </CardContent>
+        </Card>
       </div>
+
+      {/* 浮动添加按钮 - 仅在未显示表单时显示 */}
+      {!showForm && (
+        <FAB
+          onClick={() => setShowForm(true)}
+          icon="➕"
+          aria-label="添加食物记录"
+        />
+      )}
 
       {/* 成功提示 */}
       {successMessage && (

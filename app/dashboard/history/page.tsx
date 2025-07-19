@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FoodCalendar } from '@/components/calendar'
 import { FoodRecordsDisplay } from '@/components/food'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ContentLoading } from '@/components/ui/loading-spinner'
+import { CaloriesDisplay, StatsCard } from '@/components/ui/number-display'
+import { MealTypeStats } from '@/components/ui/meal-type-selector'
 import { ClientFoodRecordService } from '@/lib/client-api'
 import { getCurrentDate, formatDateWithWeekday } from '@/lib/date-utils'
 import type { FoodRecord } from '@/types/database'
@@ -44,94 +46,185 @@ export default function HistoryPage() {
     loadRecordsForDate(selectedDate)
   }
 
-  return (
-    <div className="space-y-4 md:space-y-6">
-      <div className="bg-white shadow rounded-lg p-4 md:p-6">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">历史记录</h1>
-        <p className="text-gray-600">查看过往的饮食记录</p>
-      </div>
+  // 计算选中日期的统计数据
+  const dayStats = React.useMemo(() => {
+    const totalCalories = records.reduce((sum, record) => sum + (record.calories || 0), 0)
+    const mealStats = {
+      breakfast: { count: 0, calories: 0 },
+      lunch: { count: 0, calories: 0 },
+      dinner: { count: 0, calories: 0 },
+      snack: { count: 0, calories: 0 }
+    }
+    
+    records.forEach(record => {
+      const mealType = record.meal_type as keyof typeof mealStats
+      if (mealStats[mealType]) {
+        mealStats[mealType].count++
+        mealStats[mealType].calories += record.calories || 0
+      }
+    })
+    
+    return { totalCalories, mealStats }
+  }, [records])
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+  return (
+    <div className="space-y-6">
+      {/* 页面头部 */}
+      <Card variant="elevated" className="bg-gradient-to-br from-background to-primary/5">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                📅 历史记录
+              </h1>
+              <p className="text-gray-600">
+                查看过往的饮食记录，追踪您的健康历程
+              </p>
+            </div>
+            
+            {/* 选中日期的总热量 */}
+            {records.length > 0 && (
+              <div className="flex-shrink-0">
+                <CaloriesDisplay 
+                  calories={dayStats.totalCalories} 
+                  size="2xl"
+                  animated={true}
+                  className="text-center"
+                />
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* 日历组件 */}
         <div className="xl:col-span-1">
-          <FoodCalendar
-            selectedDate={selectedDate}
-            onDateSelect={handleDateSelect}
-            className="w-full"
-          />
+          <Card variant="interactive">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span>📆</span>
+                <span>选择日期</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FoodCalendar
+                selectedDate={selectedDate}
+                onDateSelect={handleDateSelect}
+                className="w-full"
+              />
+            </CardContent>
+          </Card>
         </div>
 
         {/* 记录显示区域 */}
-        <div className="xl:col-span-1">
-          <Card className="p-4 md:p-6">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {formatDateWithWeekday(selectedDate)}
-              </h2>
+        <div className="xl:col-span-2 space-y-6">
+          {/* 日期统计概览 */}
+          {records.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <MealTypeStats
+                mealType="breakfast"
+                count={dayStats.mealStats.breakfast.count}
+                calories={dayStats.mealStats.breakfast.calories}
+              />
+              <MealTypeStats
+                mealType="lunch"
+                count={dayStats.mealStats.lunch.count}
+                calories={dayStats.mealStats.lunch.calories}
+              />
+              <MealTypeStats
+                mealType="dinner"
+                count={dayStats.mealStats.dinner.count}
+                calories={dayStats.mealStats.dinner.calories}
+              />
+              <MealTypeStats
+                mealType="snack"
+                count={dayStats.mealStats.snack.count}
+                calories={dayStats.mealStats.snack.calories}
+              />
             </div>
+          )}
 
-            {/* 错误状态 */}
-            {error && (
-              <div className="text-center py-8">
-                <div className="text-red-600 mb-2">
-                  <p className="font-medium">加载失败</p>
-                  <p className="text-sm">{error}</p>
+          {/* 记录详情卡片 */}
+          <Card variant="interactive">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span>📝</span>
+                  <span>{formatDateWithWeekday(selectedDate)}</span>
                 </div>
-                <Button 
-                  onClick={handleRetry} 
-                  variant="outline" 
-                  size="sm"
-                >
-                  重试
-                </Button>
-              </div>
-            )}
-
-            {/* 加载状态 */}
-            {loading && !error && (
-              <ContentLoading text="加载记录中..." />
-            )}
-
-            {/* 记录内容 */}
-            {!loading && !error && (
-              <>
-                {records.length > 0 ? (
-                  <FoodRecordsDisplay
-                    records={records}
-                  />
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="text-gray-400 mb-4">
-                      <svg 
-                        className="w-16 h-16 mx-auto mb-4" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={1.5} 
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      这一天还没有记录
-                    </h3>
-                    <p className="text-gray-500 mb-4">
-                      选择其他日期查看历史记录
-                    </p>
-                    <Button 
-                      onClick={() => setSelectedDate(getCurrentDate())}
-                      variant="outline"
-                    >
-                      回到今天
-                    </Button>
-                  </div>
+                {records.length > 0 && (
+                  <span className="text-sm font-normal text-gray-600 bg-gray-100 px-3 py-1 rounded-button">
+                    {records.length} 项记录
+                  </span>
                 )}
-              </>
-            )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* 错误状态 */}
+              {error && (
+                <div className="text-center py-8">
+                  <div className="mb-4">
+                    <span className="text-4xl">⚠️</span>
+                  </div>
+                  <div className="text-accent-error mb-4">
+                    <p className="font-medium">加载失败</p>
+                    <p className="text-sm">{error}</p>
+                  </div>
+                  <Button 
+                    onClick={handleRetry} 
+                    variant="outline" 
+                    size="sm"
+                    className="border-accent-error text-accent-error hover:bg-accent-error hover:text-white"
+                  >
+                    重试
+                  </Button>
+                </div>
+              )}
+
+              {/* 加载状态 */}
+              {loading && !error && (
+                <ContentLoading text="加载记录中..." />
+              )}
+
+              {/* 记录内容 */}
+              {!loading && !error && (
+                <>
+                  {records.length > 0 ? (
+                    <FoodRecordsDisplay
+                      records={records}
+                    />
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-6xl mb-4">
+                        📋
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        这一天还没有记录
+                      </h3>
+                      <p className="text-gray-500 mb-6">
+                        选择其他日期查看历史记录，或者回到今天开始记录
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Button 
+                          onClick={() => setSelectedDate(getCurrentDate())}
+                          variant="outline"
+                          size="lg"
+                        >
+                          📅 回到今天
+                        </Button>
+                        <Button 
+                          onClick={() => window.location.href = '/dashboard/today'}
+                          size="lg"
+                        >
+                          ➕ 开始记录
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
           </Card>
         </div>
       </div>

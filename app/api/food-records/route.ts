@@ -40,9 +40,14 @@ async function securityMiddleware(request: NextRequest): Promise<void> {
   // 验证请求来源
   const allowedOrigins = [
     process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'http://localhost:3000', // 开发环境
+    'http://localhost:3001', // 开发环境备用端口
+    'http://localhost:3002', // 开发环境备用端口
     '*.pages.dev', // Cloudflare Pages
     '*.workers.dev', // Cloudflare Workers
-    'https://food-tracker-app.includeleec-b6f.workers.dev' // 明确的生产域名
+    'https://food-tracker-app.includeleec-b6f.workers.dev', // 明确的生产域名
+    'https://food.tinycard.xyz', // 自定义域名
+    '*.tinycard.xyz' // 允许子域名
   ]
   
   if (!validateRequestOrigin(request, allowedOrigins)) {
@@ -350,7 +355,11 @@ export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin') || ''
   const allowedOrigins = [
     process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    'https://food-tracker-app.includeleec-b6f.workers.dev'
+    'http://localhost:3000', // 开发环境
+    'http://localhost:3001', // 开发环境备用端口
+    'http://localhost:3002', // 开发环境备用端口
+    'https://food-tracker-app.includeleec-b6f.workers.dev',
+    'https://food.tinycard.xyz' // 自定义域名
   ]
   
   // 动态设置 CORS origin

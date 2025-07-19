@@ -48,9 +48,14 @@ export function validateRequestOrigin(request: NextRequest, allowedOrigins: stri
   const origin = request.headers.get('origin')
   const referer = request.headers.get('referer')
   
-  // 对于同源请求（如从同一域名的页面发起的请求），origin 可能为空
+  // 在开发环境中，对于同源请求，origin 可能为空，这是正常的
   // 在 Cloudflare Workers 环境中，某些内部请求可能没有这些 headers
   if (!origin && !referer) {
+    // 开发环境允许无 origin 的请求
+    if (process.env.NODE_ENV === 'development') {
+      return true
+    }
+    
     // 在生产环境中，如果是来自 Cloudflare Workers 的内部请求，允许通过
     const userAgent = request.headers.get('user-agent')
     if (userAgent && userAgent.includes('Cloudflare-Workers')) {
@@ -70,11 +75,12 @@ export function validateRequestOrigin(request: NextRequest, allowedOrigins: stri
     // 处理通配符匹配 (*.domain.com)
     if (allowed.startsWith('*.')) {
       const domain = allowed.substring(2)
-      return requestOrigin.endsWith('.' + domain) || requestOrigin === 'https://' + domain
+      return requestOrigin.endsWith('.' + domain) || requestOrigin === 'https://' + domain || requestOrigin === 'http://' + domain
     }
     
     // 处理子域匹配
-    return requestOrigin.endsWith('.' + allowed.replace('https://', '').replace('http://', ''))
+    const cleanAllowed = allowed.replace('https://', '').replace('http://', '')
+    return requestOrigin.endsWith('.' + cleanAllowed) || requestOrigin.includes(cleanAllowed)
   })
 }
 
