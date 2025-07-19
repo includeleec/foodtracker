@@ -6,6 +6,10 @@
 [![技术栈](https://img.shields.io/badge/技术栈-Next.js%2015-blue)](https://nextjs.org)
 [![数据库](https://img.shields.io/badge/数据库-Supabase-green)](https://supabase.com)
 
+### Vibe Coding
+本项目使用 Kiro 和 Claude Code 构建。
+Claude Code 我目前使用的是 Claude Code 镜像池: [https://gaccode.com/signup?ref=0FIU5756](https://gaccode.com/signup?ref=0FIU5756)
+
 ## 🌟 产品特性
 
 ### 核心功能
