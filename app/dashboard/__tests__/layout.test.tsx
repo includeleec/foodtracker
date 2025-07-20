@@ -126,12 +126,11 @@ describe('DashboardLayout', () => {
       </DashboardLayout>
     )
 
-    expect(screen.getByText('仪表板')).toBeInTheDocument()
     expect(screen.getByText('今日记录')).toBeInTheDocument()
     expect(screen.getByText('历史记录')).toBeInTheDocument()
 
     // Check that dashboard is active (current path is /dashboard)
-    const dashboardLink = screen.getByText('仪表板').closest('a')
+    const dashboardLink = screen.getByText('今日记录').closest('a')
     expect(dashboardLink).toHaveClass('text-blue-600', 'border-blue-500')
   })
 

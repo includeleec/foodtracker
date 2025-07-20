@@ -129,7 +129,7 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6">
       {/* 页面头部 */}
-      <Card variant="elevated" className="bg-gradient-to-br from-background to-primary/5">
+      <Card variant="elevated" className="bg-gradient-to-br from-white to-primary/5">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -159,7 +159,7 @@ export default function HistoryPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* 日历组件 */}
         <div className="xl:col-span-1">
-          <Card variant="interactive">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span>📆</span>
@@ -205,7 +205,7 @@ export default function HistoryPage() {
           )}
 
           {/* 记录详情卡片 */}
-          <Card variant="interactive">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

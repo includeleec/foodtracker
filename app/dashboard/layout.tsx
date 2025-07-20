@@ -46,16 +46,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const navigationItems = [
     {
-      name: '仪表板',
-      href: '/dashboard',
-      icon: '🏠',
-      current: pathname === '/dashboard'
-    },
-    {
       name: '今日记录',
-      href: '/dashboard/today',
+      href: '/dashboard',
       icon: '📝',
-      current: pathname === '/dashboard/today'
+      current: pathname === '/dashboard'
     },
     {
       name: '历史记录',
