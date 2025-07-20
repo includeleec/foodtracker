@@ -1,0 +1,53 @@
+{
+  "name": "Daily Food Tracker",
+  "short_name": "FoodTracker",
+  "description": "Track your daily food intake and manage dietary habits",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "zh-CN",
+  "categories": ["health", "lifestyle", "food"],
+  "icons": [
+    {
+      "src": "/green_salad.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/green_salad.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "今日记录",
+      "short_name": "今日",
+      "description": "查看并添加今日饮食记录",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/green_salad.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "历史记录",
+      "short_name": "历史",
+      "description": "查看历史饮食记录",
+      "url": "/dashboard/history",
+      "icons": [
+        {
+          "src": "/green_salad.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

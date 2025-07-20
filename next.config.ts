@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
   // 图片优化配置
@@ -61,8 +62,44 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// PWA Configuration
+const pwaConfig = withPWA({
+  dest: 'public',
+  register: false, // We handle registration manually
+  skipWaiting: false,
+  disable: process.env.NODE_ENV === 'development',
+  // Simplified runtime caching
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'google-fonts',
+      },
+    },
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'images',
+      },
+    },
+    {
+      urlPattern: /\.(?:js|css)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-resources',
+      },
+    },
+    {
+      urlPattern: /\/api\/.*$/i,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'api-cache',
+        networkTimeoutSeconds: 10,
+      },
+    },
+  ],
+});
 
-// added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-initOpenNextCloudflareForDev();
+export default pwaConfig(nextConfig);
