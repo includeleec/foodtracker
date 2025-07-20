@@ -46,7 +46,7 @@ export function FoodRecordsDisplay({
   }, {} as Record<MealType, FoodRecord[]>)
 
   // 计算总卡路里
-  const totalCalories = records.reduce((sum, record) => sum + record.calories, 0)
+  const totalCalories = records.reduce((sum, record) => sum + (record.calories || 0), 0)
 
   // 处理删除确认
   const handleDeleteClick = (record: FoodRecord) => {

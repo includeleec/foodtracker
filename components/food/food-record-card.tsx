@@ -136,7 +136,7 @@ export function FoodRecordCard({
               </span>
               <span className="flex items-center gap-1 font-medium text-orange-600">
                 <span>🔥</span>
-                {record.calories} 卡路里
+                {record.calories ? `${record.calories} 卡路里` : '未设置卡路里'}
               </span>
             </div>
           </div>

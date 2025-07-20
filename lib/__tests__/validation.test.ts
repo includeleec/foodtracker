@@ -168,7 +168,7 @@ describe('表单验证函数', () => {
     it('应该检测缺失的必填字段', () => {
       const result = validateFoodRecordForm({})
       expect(result.isValid).toBe(false)
-      expect(result.errors).toHaveLength(5) // 5个必填字段
+      expect(result.errors).toHaveLength(4) // 4个必填字段（卡路里现在是可选的）
     })
 
     it('应该验证餐次类型', () => {
@@ -204,6 +204,21 @@ describe('表单验证函数', () => {
       const result = validateFoodRecordForm(invalidData)
       expect(result.isValid).toBe(false)
       expect(result.errors.some(e => e.field === 'record_date')).toBe(true)
+    })
+
+    it('应该允许卡路里为可选字段', () => {
+      const dataWithoutCalories = { ...validData }
+      delete dataWithoutCalories.calories
+      const result = validateFoodRecordForm(dataWithoutCalories)
+      expect(result.isValid).toBe(true)
+      expect(result.errors).toHaveLength(0)
+    })
+
+    it('应该验证提供的卡路里值', () => {
+      const invalidData = { ...validData, calories: -1 }
+      const result = validateFoodRecordForm(invalidData)
+      expect(result.isValid).toBe(false)
+      expect(result.errors.some(e => e.field === 'calories')).toBe(true)
     })
   })
 

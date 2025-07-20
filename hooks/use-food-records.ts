@@ -170,7 +170,7 @@ export function useFoodRecordsManager(date: string) {
   }, [user?.access_token, refresh])
 
   // 计算总卡路里
-  const totalCalories = records ? records.reduce((sum, record) => sum + record.calories, 0) : 0
+  const totalCalories = records ? records.reduce((sum, record) => sum + (record.calories || 0), 0) : 0
 
   return {
     records: records || [],

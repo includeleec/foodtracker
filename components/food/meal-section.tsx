@@ -54,7 +54,7 @@ export function MealSection({
   className
 }: MealSectionProps) {
   const config = MEAL_TYPE_CONFIG[mealType]
-  const totalCalories = records.reduce((sum, record) => sum + record.calories, 0)
+  const totalCalories = records.reduce((sum, record) => sum + (record.calories || 0), 0)
   const hasRecords = records.length > 0
 
   return (

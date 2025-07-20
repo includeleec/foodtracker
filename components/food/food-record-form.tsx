@@ -148,7 +148,7 @@ export function FoodRecordForm({
       meal_type: formData.meal_type as MealType,
       food_name: formData.food_name,
       weight: parseFloat(formData.weight),
-      calories: parseFloat(formData.calories),
+      calories: formData.calories ? parseFloat(formData.calories) : undefined,
       record_date: formData.record_date,
       image_url: formData.image_url || undefined,
       image_id: formData.image_id || undefined
@@ -186,7 +186,7 @@ export function FoodRecordForm({
         meal_type: formData.meal_type as MealType,
         food_name: formData.food_name.trim(),
         weight: parseFloat(formData.weight),
-        calories: parseFloat(formData.calories),
+        calories: formData.calories ? parseFloat(formData.calories) : undefined,
         record_date: formData.record_date,
         image_url: formData.image_url || undefined,
         image_id: formData.image_id || undefined
@@ -337,13 +337,13 @@ export function FoodRecordForm({
         {/* 卡路里 */}
         <div className="space-y-2">
           <Label htmlFor="calories" className="text-base font-medium">
-            卡路里 <span className="text-red-500">*</span>
+            卡路里 <span className="text-gray-400">(可选)</span>
           </Label>
           <Input
             id="calories"
             type="number"
             step="1"
-            min="1"
+            min="0"
             max="10000"
             value={formData.calories}
             onChange={(e) => handleInputChange('calories', e.target.value)}

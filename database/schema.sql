@@ -8,7 +8,7 @@ CREATE TABLE food_records (
   meal_type VARCHAR(20) NOT NULL CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
   food_name VARCHAR(255) NOT NULL,
   weight DECIMAL(8,2) NOT NULL,
-  calories DECIMAL(8,2) NOT NULL,
+  calories DECIMAL(8,2),
   image_url VARCHAR(500),
   image_id VARCHAR(255),
   record_date DATE NOT NULL,

@@ -55,13 +55,13 @@ export function createDailyRecords(date: string, records: FoodRecord[]): DailyRe
 
 // 卡路里计算函数
 export function calculateTotalCalories(records: FoodRecord[]): number {
-  return records.reduce((total, record) => total + record.calories, 0)
+  return records.reduce((total, record) => total + (record.calories || 0), 0)
 }
 
 export function calculateMealCalories(records: FoodRecord[], mealType: MealType): number {
   return records
     .filter(record => record.meal_type === mealType)
-    .reduce((total, record) => total + record.calories, 0)
+    .reduce((total, record) => total + (record.calories || 0), 0)
 }
 
 export function calculateDailyCaloriesByMeal(records: FoodRecord[]): Record<MealType, number> {
@@ -144,7 +144,7 @@ export function sortRecordsByTime(records: FoodRecord[]): FoodRecord[] {
 
 export function sortRecordsByCalories(records: FoodRecord[], descending = true): FoodRecord[] {
   return [...records].sort((a, b) => 
-    descending ? b.calories - a.calories : a.calories - b.calories
+    descending ? (b.calories || 0) - (a.calories || 0) : (a.calories || 0) - (b.calories || 0)
   )
 }
 
@@ -230,7 +230,7 @@ export function exportRecordsToCSV(records: FoodRecord[]): string {
     mealTypeMap[record.meal_type],
     record.food_name,
     record.weight.toString(),
-    record.calories.toString(),
+    (record.calories || 0).toString(),
     new Date(record.created_at).toLocaleString('zh-CN')
   ])
   

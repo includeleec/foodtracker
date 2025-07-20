@@ -123,7 +123,7 @@ export default function TodayPage() {
   }
 
   // Calculate total calories
-  const totalCalories = records.reduce((sum, record) => sum + record.calories, 0)
+  const totalCalories = records.reduce((sum, record) => sum + (record.calories || 0), 0)
 
   // Loading state
   if (loading) {
@@ -164,7 +164,7 @@ export default function TodayPage() {
             { title: '加餐', icon: '🍎', type: 'snack' }
           ].map((meal) => {
             const mealRecords = records.filter(r => r.meal_type === meal.type)
-            const mealCalories = mealRecords.reduce((sum, r) => sum + r.calories, 0)
+            const mealCalories = mealRecords.reduce((sum, r) => sum + (r.calories || 0), 0)
             
             return (
               <Card key={meal.type} className="p-4">

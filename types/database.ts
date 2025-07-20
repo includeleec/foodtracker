@@ -10,7 +10,7 @@ export interface Database {
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           food_name: string
           weight: number
-          calories: number
+          calories: number | null
           image_url: string | null
           image_id: string | null
           record_date: string
@@ -23,7 +23,7 @@ export interface Database {
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           food_name: string
           weight: number
-          calories: number
+          calories?: number | null
           image_url?: string | null
           image_id?: string | null
           record_date: string
@@ -95,7 +95,7 @@ export interface FoodRecordFormData {
   meal_type: MealType
   food_name: string
   weight: number
-  calories: number
+  calories?: number
   image_url?: string
   image_id?: string
   record_date: string

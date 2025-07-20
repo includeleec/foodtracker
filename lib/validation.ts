@@ -107,10 +107,8 @@ export function validateFoodRecordForm(data: Partial<FoodRecordFormData>): FormV
     })
   }
 
-  // 验证卡路里
-  if (data.calories === undefined || data.calories === null) {
-    errors.push({ field: 'calories', message: '请输入卡路里' })
-  } else if (!isValidCalories(data.calories)) {
+  // 验证卡路里（可选字段）
+  if (data.calories !== undefined && data.calories !== null && !isValidCalories(data.calories)) {
     errors.push({ 
       field: 'calories', 
       message: `卡路里应在 ${VALIDATION_RULES.CALORIES.MIN}-${VALIDATION_RULES.CALORIES.MAX} 之间` 

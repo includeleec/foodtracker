@@ -178,7 +178,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const body = await request.json() as any
     
     // 验证必填字段
-    const requiredFields = ['meal_type', 'food_name', 'weight', 'calories', 'record_date']
+    const requiredFields = ['meal_type', 'food_name', 'weight', 'record_date']
     const missingFields = requiredFields.filter(field => !body[field])
     
     if (missingFields.length > 0) {
@@ -244,7 +244,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       )
     }
 
-    if (isNaN(calories) || calories <= 0 || calories > 10000) {
+    // 卡路里为可选字段，如果提供则验证
+    if (calories !== undefined && calories !== null && (isNaN(calories) || calories < 0 || calories > 10000)) {
       return NextResponse.json(
         { success: false, error: '卡路里必须是0-10000之间的数字' },
         { 
@@ -317,7 +318,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       meal_type: cleanMealType as any,
       food_name: cleanFoodName,
       weight: weight,
-      calories: calories,
+      calories: calories !== undefined && calories !== null ? calories : null,
       record_date: cleanRecordDate,
       image_url: cleanImageUrl,
       image_id: cleanImageId
