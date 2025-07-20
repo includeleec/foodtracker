@@ -46,7 +46,7 @@ export function CalendarDay({
     <div
       className={cn(
         // 基础样式
-        'relative aspect-square border rounded-lg cursor-pointer transition-all duration-200',
+        'relative aspect-square border border-gray-200 rounded-lg cursor-pointer transition-all duration-200',
         'flex flex-col items-center justify-center p-1',
         'hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1',
         

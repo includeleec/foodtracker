@@ -148,7 +148,7 @@ export function FoodRecordForm({
       meal_type: formData.meal_type as MealType,
       food_name: formData.food_name,
       weight: parseFloat(formData.weight),
-      calories: formData.calories ? parseFloat(formData.calories) : undefined,
+      calories: formData.calories.trim() ? parseFloat(formData.calories) : undefined,
       record_date: formData.record_date,
       image_url: formData.image_url || undefined,
       image_id: formData.image_id || undefined
@@ -186,7 +186,7 @@ export function FoodRecordForm({
         meal_type: formData.meal_type as MealType,
         food_name: formData.food_name.trim(),
         weight: parseFloat(formData.weight),
-        calories: formData.calories ? parseFloat(formData.calories) : undefined,
+        calories: formData.calories.trim() ? parseFloat(formData.calories) : undefined,
         record_date: formData.record_date,
         image_url: formData.image_url || undefined,
         image_id: formData.image_id || undefined

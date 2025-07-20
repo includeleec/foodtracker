@@ -96,7 +96,7 @@ export function FoodCalendar({ selectedDate, onDateSelect, className = '' }: Foo
 
   if (error) {
     return (
-      <Card className={`p-4 ${className}`}>
+      <div className={`${className}`}>
         <div className="text-center text-red-600">
           <p>加载日历失败</p>
           <p className="text-sm text-gray-500 mt-1">{error}</p>
@@ -109,12 +109,12 @@ export function FoodCalendar({ selectedDate, onDateSelect, className = '' }: Foo
             重试
           </Button>
         </div>
-      </Card>
+      </div>
     )
   }
 
   return (
-    <Card className={`p-3 md:p-4 ${className}`}>
+    <div className={``}>
       {/* 日历头部 - 响应式布局 */}
       <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center justify-between sm:justify-start sm:gap-2">
@@ -206,6 +206,6 @@ export function FoodCalendar({ selectedDate, onDateSelect, className = '' }: Foo
           <span>无记录</span>
         </div>
       </div>
-    </Card>
+    </div>
   )
 }

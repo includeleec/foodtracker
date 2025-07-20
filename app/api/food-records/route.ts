@@ -236,7 +236,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     // 卡路里为可选字段，如果提供则验证
-    if (calories !== undefined && calories !== null && (isNaN(calories) || calories < 0 || calories > 10000)) {
+    if (calories !== undefined && calories !== null && (calories < 0 || calories > 10000)) {
+      console.log('Invalid calories value:', calories)
       return NextResponse.json(
         { success: false, error: '卡路里必须是0-10000之间的数字' },
         { 

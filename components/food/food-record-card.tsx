@@ -42,7 +42,16 @@ export function FoodRecordCard({
     if (onDelete && !isDeleting) {
       setIsDeleting(true)
       try {
+        console.log('食物记录卡片：开始删除记录', record.id)
         await onDelete(record)
+        console.log('食物记录卡片：删除记录成功', record.id)
+      } catch (error) {
+        console.error('食物记录卡片：删除记录失败', error, {
+          recordId: record.id,
+          foodName: record.food_name,
+          mealType: record.meal_type,
+          timestamp: new Date().toISOString()
+        })
       } finally {
         setIsDeleting(false)
       }

@@ -26,6 +26,12 @@ export function FoodRecordsDisplay({
   showDate = false,
   className
 }: FoodRecordsDisplayProps) {
+  console.log('🔄 FoodRecordsDisplay 重新渲染:', {
+    functionString: onDeleteRecord?.toString().substring(0, 200),
+    date,
+    recordsCount: records.length,
+    componentId: Math.random().toString(36).substring(7)
+  })
   const [deleteDialog, setDeleteDialog] = useState<{
     isOpen: boolean
     record: FoodRecord | null
@@ -50,6 +56,8 @@ export function FoodRecordsDisplay({
 
   // 处理删除确认
   const handleDeleteClick = (record: FoodRecord) => {
+    console.log('🗑️ 删除按钮被点击:', record.id, record.food_name)
+    console.log('🗑️ onDeleteRecord 函数存在:', !!onDeleteRecord)
     setDeleteDialog({
       isOpen: true,
       record,
@@ -59,27 +67,47 @@ export function FoodRecordsDisplay({
 
   // 处理删除确认
   const handleDeleteConfirm = async () => {
+    console.log('✅ 确认删除按钮被点击')
+    console.log('✅ 删除记录:', deleteDialog.record?.id, deleteDialog.record?.food_name)
+    console.log('✅ onDeleteRecord 函数:', onDeleteRecord)
+    
     if (!deleteDialog.record || !onDeleteRecord) {
+      console.log('❌ 删除条件不满足:', { 
+        hasRecord: !!deleteDialog.record, 
+        hasDeleteFunction: !!onDeleteRecord 
+      })
       return
     }
 
     setDeleteDialog(prev => ({ ...prev, isLoading: true }))
 
     try {
+      console.log('🚀 开始调用删除函数...')
       await onDeleteRecord(deleteDialog.record)
       setDeleteDialog({
         isOpen: false,
         record: null,
         isLoading: false
       })
+      console.log('删除确认对话框：记录删除成功', deleteDialog.record.id)
     } catch (error) {
-      // 错误处理由父组件负责
+      console.error('删除确认对话框：删除失败', error, {
+        recordId: deleteDialog.record.id,
+        foodName: deleteDialog.record.food_name,
+        mealType: deleteDialog.record.meal_type,
+        timestamp: new Date().toISOString()
+      })
+      // 错误处理由父组件负责，但确保对话框状态恢复
       setDeleteDialog(prev => ({ ...prev, isLoading: false }))
     }
   }
 
   // 关闭删除对话框
   const handleDeleteCancel = () => {
+    console.log('❌ 取消删除按钮被点击')
+    console.log('❌ 当前删除对话框状态:', deleteDialog)
+    console.log('❌ 是否正在加载:', deleteDialog.isLoading)
+    
     if (!deleteDialog.isLoading) {
       setDeleteDialog({
         isOpen: false,
@@ -153,8 +181,14 @@ export function FoodRecordsDisplay({
       {/* 删除确认对话框 */}
       <ConfirmDialog
         isOpen={deleteDialog.isOpen}
-        onCancel={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          console.log('📤 FoodRecordsDisplay - onCancel 被调用')
+          handleDeleteCancel()
+        }}
+        onConfirm={() => {
+          console.log('📤 FoodRecordsDisplay - onConfirm 被调用')
+          handleDeleteConfirm()
+        }}
         title="删除食物记录"
         message={`确定要删除"${deleteDialog.record?.food_name}"的记录吗？此操作无法撤销。`}
         confirmText="删除"

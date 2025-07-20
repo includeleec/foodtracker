@@ -115,20 +115,17 @@ export function ConfirmDialog({
         </div>
 
         {/* 操作按钮 */}
-        <div className="flex flex-col-reverse gap-3 px-6 pb-6 sm:flex-row sm:justify-end">
+        <div className="flex flex-col gap-3 px-6 pb-6 sm:flex-row sm:justify-end">
+          {/* 确认按钮在移动端显示在上方，桌面端显示在右侧 */}
           <Button
-            variant="outline"
-            onClick={onCancel}
-            disabled={isLoading}
-            className="w-full sm:w-auto"
-          >
-            {cancelText}
-          </Button>
-          <Button
-            onClick={onConfirm}
+            onClick={() => {
+              console.log('🔴 确认按钮被点击')
+              console.log('🔴 确认函数:', onConfirm)
+              onConfirm()
+            }}
             disabled={isLoading}
             className={cn(
-              'w-full sm:w-auto',
+              'w-full sm:w-auto order-1 sm:order-2',
               style.confirmButton
             )}
           >
@@ -140,6 +137,19 @@ export function ConfirmDialog({
             ) : (
               confirmText
             )}
+          </Button>
+          
+          {/* 取消按钮在移动端显示在下方，桌面端显示在左侧 */}
+          <Button
+            variant="outline"
+            onClick={() => {
+              console.log('🔘 取消按钮被点击')
+              onCancel()
+            }}
+            disabled={isLoading}
+            className="w-full sm:w-auto order-2 sm:order-1"
+          >
+            {cancelText}
           </Button>
         </div>
       </div>

@@ -58,7 +58,7 @@ export function isValidWeight(weight: number): boolean {
 
 export function isValidCalories(calories: number): boolean {
   return !isNaN(calories) && 
-         calories >= VALIDATION_RULES.CALORIES.MIN && 
+         calories >= 0 && 
          calories <= VALIDATION_RULES.CALORIES.MAX
 }
 
@@ -111,7 +111,7 @@ export function validateFoodRecordForm(data: Partial<FoodRecordFormData>): FormV
   if (data.calories !== undefined && data.calories !== null && !isValidCalories(data.calories)) {
     errors.push({ 
       field: 'calories', 
-      message: `卡路里应在 ${VALIDATION_RULES.CALORIES.MIN}-${VALIDATION_RULES.CALORIES.MAX} 之间` 
+      message: `卡路里必须是0-${VALIDATION_RULES.CALORIES.MAX}之间的数字` 
     })
   }
 
@@ -186,8 +186,8 @@ export function sanitizeFoodRecordData(data: Partial<FoodRecordFormData>): Parti
   return {
     ...data,
     food_name: data.food_name?.trim(),
-    weight: data.weight ? Number(data.weight) : undefined,
-    calories: data.calories ? Number(data.calories) : undefined,
+    weight: data.weight !== undefined && data.weight !== null ? Number(data.weight) : undefined,
+    calories: data.calories !== undefined && data.calories !== null ? Number(data.calories) : undefined,
   }
 }
 
