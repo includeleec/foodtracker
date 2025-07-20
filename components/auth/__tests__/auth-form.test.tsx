@@ -1,22 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AuthForm } from '../auth-form'
 import { AuthService } from '@/lib/auth'
-import { it } from 'node:test'
-import { describe } from 'node:test'
-import { it } from 'node:test'
-import { it } from 'node:test'
-import { describe } from 'node:test'
-import { it } from 'node:test'
-import { it } from 'node:test'
-import { it } from 'node:test'
-import { describe } from 'node:test'
-import { it } from 'node:test'
-import { it } from 'node:test'
-import { it } from 'node:test'
-import { it } from 'node:test'
-import { describe } from 'node:test'
-import { beforeEach } from 'node:test'
-import { describe } from 'node:test'
 
 // Mock AuthService
 jest.mock('@/lib/auth', () => ({

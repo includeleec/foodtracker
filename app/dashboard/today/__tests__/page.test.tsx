@@ -11,7 +11,10 @@ jest.mock('next/navigation', () => ({
 }))
 
 jest.mock('@/lib/auth-context', () => ({
-  useAuth: jest.fn(),
+  useAuth: jest.fn(() => ({
+    user: { id: 'user1', email: 'test@example.com' },
+    signOut: jest.fn()
+  })),
 }))
 
 jest.mock('@/lib/date-utils', () => ({

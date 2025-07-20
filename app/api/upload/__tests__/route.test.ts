@@ -8,6 +8,15 @@ import { getConfig } from '@/lib/config'
 // Mock dependencies
 jest.mock('@/lib/config')
 jest.mock('@supabase/supabase-js')
+const mockValidateJwtFormat = jest.fn()
+jest.mock('@/lib/security-utils', () => ({
+  validateRequestOrigin: jest.fn(() => true),
+  checkRateLimit: jest.fn(() => ({ allowed: true, remaining: 10 })),
+  validateFileUpload: jest.fn(() => ({ valid: true })),
+  validateImageMagicNumbers: jest.fn(() => true),
+  getSecurityHeaders: jest.fn(() => ({})),
+  validateJwtFormat: mockValidateJwtFormat
+}))
 
 const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
@@ -28,6 +37,11 @@ jest.mock('@supabase/supabase-js', () => ({
 describe('/api/upload', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    
+    // Default JWT validation mock - returns true for valid tokens
+    mockValidateJwtFormat.mockImplementation((token: string) => {
+      return token.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')
+    })
     
     // Default config mock
     mockGetConfig.mockReturnValue({
@@ -73,11 +87,12 @@ describe('/api/upload', () => {
       const formData = new FormData()
       formData.append('file', testFile)
 
-      // Create request
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      // Create request with proper origin
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer valid-token'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          'Origin': 'https://food.tinycard.xyz'
         },
         body: formData
       })
@@ -102,8 +117,11 @@ describe('/api/upload', () => {
       const formData = new FormData()
       formData.append('file', testFile)
 
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
+        headers: {
+          'Origin': 'https://food.tinycard.xyz'
+        },
         body: formData
       })
 
@@ -128,10 +146,11 @@ describe('/api/upload', () => {
       const formData = new FormData()
       formData.append('file', testFile)
 
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer invalid-token'
+          'Authorization': 'Bearer invalid.jwt.token',
+          'Origin': 'https://food.tinycard.xyz'
         },
         body: formData
       })
@@ -143,7 +162,7 @@ describe('/api/upload', () => {
 
       expect(response.status).toBe(500)
       expect(data.success).toBe(false)
-      expect(data.error).toContain('Invalid authentication token')
+      expect(data.error).toContain('Invalid JWT format')
     })
 
     it('should reject request without file', async () => {
@@ -155,10 +174,11 @@ describe('/api/upload', () => {
 
       const formData = new FormData()
 
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer valid-token'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          'Origin': 'https://food.tinycard.xyz'
         },
         body: formData
       })
@@ -184,10 +204,11 @@ describe('/api/upload', () => {
       const formData = new FormData()
       formData.append('file', testFile)
 
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer valid-token'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          'Origin': 'https://food.tinycard.xyz'
         },
         body: formData
       })
@@ -215,10 +236,11 @@ describe('/api/upload', () => {
       const formData = new FormData()
       formData.append('file', testFile)
 
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer valid-token'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          'Origin': 'https://food.tinycard.xyz'
         },
         body: formData
       })
@@ -252,10 +274,11 @@ describe('/api/upload', () => {
       const formData = new FormData()
       formData.append('file', testFile)
 
-      const request = new NextRequest('http://localhost:3000/api/upload', {
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer valid-token'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          'Origin': 'https://food.tinycard.xyz'
         },
         body: formData
       })
@@ -273,7 +296,14 @@ describe('/api/upload', () => {
 
   describe('OPTIONS /api/upload', () => {
     it('should handle CORS preflight request', async () => {
-      const response = await OPTIONS()
+      const request = new NextRequest('https://food.tinycard.xyz/api/upload', {
+        method: 'OPTIONS',
+        headers: {
+          'Origin': 'https://food.tinycard.xyz'
+        }
+      })
+
+      const response = await OPTIONS(request)
 
       expect(response.status).toBe(200)
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*')

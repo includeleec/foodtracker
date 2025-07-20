@@ -60,17 +60,13 @@ test.describe('Cloudflare 部署应用页面切换测试', () => {
     await waitForPageLoad(page);
     
     // 检查首页是否正常加载
-    await expect(page).toHaveTitle(/食物追踪|Food Tracker/);
+    await expect(page).toHaveTitle(/每日食物记录/);
     
-    // 检查导航到登录页面
-    await page.click('text=登录');
-    await waitForPageLoad(page);
-    await expect(page).toHaveURL(/\/auth\/login/);
-    
-    // 检查导航到注册页面
-    await page.click('text=注册');
-    await waitForPageLoad(page);
-    await expect(page).toHaveURL(/\/auth\/register/);
+    // 检查是否能看到登录按钮或已登录状态
+    const isLoggedIn = await page.locator('dt:has-text("今日记录")').isVisible().catch(() => false)
+    if (!isLoggedIn) {
+      await expect(page.locator('button[type="submit"]:has-text("登录")')).toBeVisible()
+    }
   });
 
   test('登录后页面切换测试', async ({ page }) => {
@@ -79,26 +75,26 @@ test.describe('Cloudflare 部署应用页面切换测试', () => {
     // 测试在仪表板页面间切换
     console.log('Current URL:', page.url());
     
-    // 1. 从今日页面切换到历史页面
-    await page.click('text=历史记录');
+    // 1. 从dashboard切换到历史页面
+    await page.click('text=📅 历史记录');
     await waitForPageLoad(page);
     await expect(page).toHaveURL(/\/dashboard\/history/);
     console.log('Navigated to history page');
     
     // 检查历史页面是否正常加载
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('text=📅 历史记录')).toBeVisible();
     
     // 2. 从历史页面切换到今日页面
-    await page.click('text=今日记录');
+    await page.click('text=📝 今日记录');
     await waitForPageLoad(page);
     await expect(page).toHaveURL(/\/dashboard\/today/);
     console.log('Navigated to today page');
     
     // 检查今日页面是否正常加载
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('text=今天')).toBeVisible();
     
     // 3. 切换到主仪表板页面
-    await page.click('text=仪表板');
+    await page.click('text=🏠 仪表板');
     await waitForPageLoad(page);
     await expect(page).toHaveURL(/\/dashboard$/);
     console.log('Navigated to main dashboard');

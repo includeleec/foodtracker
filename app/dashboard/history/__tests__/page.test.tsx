@@ -2,10 +2,27 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import HistoryPage from '../page'
 import { FoodRecordService } from '@/lib/database'
 import { getCurrentDate } from '@/lib/date-utils'
+import { AuthProvider } from '@/lib/auth-context'
+
+// Mock useAuth hook
+jest.mock('@/lib/auth-context', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useAuth: () => ({
+    user: { id: 'user1', email: 'test@example.com' },
+    signOut: jest.fn()
+  })
+}))
 
 // Mock the database service
 jest.mock('@/lib/database', () => ({
   FoodRecordService: {
+    getFoodRecordsByDate: jest.fn()
+  }
+}))
+
+// Mock client API
+jest.mock('@/lib/client-api', () => ({
+  ClientAPI: {
     getFoodRecordsByDate: jest.fn()
   }
 }))
@@ -68,8 +85,8 @@ describe('HistoryPage', () => {
   it('should render page title and description', () => {
     render(<HistoryPage />)
     
-    expect(screen.getByText('历史记录')).toBeInTheDocument()
-    expect(screen.getByText('查看过往的饮食记录')).toBeInTheDocument()
+    expect(screen.getByText('📅 历史记录')).toBeInTheDocument()
+    expect(screen.getByText('查看过往的饮食记录，追踪您的健康历程')).toBeInTheDocument()
   })
 
   it('should render calendar and records display', async () => {
