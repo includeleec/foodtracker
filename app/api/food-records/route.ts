@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAuthenticatedClient } from '@/lib/supabase-server'
 import { FoodRecordService } from '@/lib/database'
+import { getAllowedOrigins } from '@/lib/config'
 import type { FoodRecordInsert, ApiResponse, FoodRecord } from '@/types/database'
 import { 
   validateRequestOrigin, 
@@ -37,18 +38,8 @@ async function validateUserAndGetClient(request: NextRequest): Promise<{ userId:
 
 // 安全验证中间件
 async function securityMiddleware(request: NextRequest): Promise<void> {
-  // 验证请求来源
-  const allowedOrigins = [
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    'http://localhost:3000', // 开发环境
-    'http://localhost:3001', // 开发环境备用端口
-    'http://localhost:3002', // 开发环境备用端口
-    '*.pages.dev', // Cloudflare Pages
-    '*.workers.dev', // Cloudflare Workers
-    'https://food-tracker-app.includeleec-b6f.workers.dev', // 明确的生产域名
-    'https://food.tinycard.xyz', // 自定义域名
-    '*.tinycard.xyz' // 允许子域名
-  ]
+  // 验证请求来源 - 使用动态配置
+  const allowedOrigins = getAllowedOrigins(request)
   
   if (!validateRequestOrigin(request, allowedOrigins)) {
     throw new Error('Invalid request origin')
@@ -354,14 +345,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 // 处理 OPTIONS 请求 (CORS)
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin') || ''
-  const allowedOrigins = [
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    'http://localhost:3000', // 开发环境
-    'http://localhost:3001', // 开发环境备用端口
-    'http://localhost:3002', // 开发环境备用端口
-    'https://food-tracker-app.includeleec-b6f.workers.dev',
-    'https://food.tinycard.xyz' // 自定义域名
-  ]
+  const allowedOrigins = getAllowedOrigins(request)
   
   // 动态设置 CORS origin
   const corsOrigin = allowedOrigins.includes(origin) ? origin : 

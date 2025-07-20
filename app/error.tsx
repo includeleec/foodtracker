@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 
 export default function Error({
   error,
@@ -37,16 +36,18 @@ export default function Error({
         )}
         
         <div className="space-y-2">
-          <Button onClick={reset} className="w-full">
+          <button 
+            onClick={reset} 
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             重试
-          </Button>
-          <Button 
-            variant="outline" 
+          </button>
+          <button 
             onClick={() => window.location.href = '/'} 
-            className="w-full"
+            className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             返回首页
-          </Button>
+          </button>
         </div>
       </div>
     </div>

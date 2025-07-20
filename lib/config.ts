@@ -74,6 +74,59 @@ export function validateConfig(): boolean {
   }
 }
 
+// 动态获取允许的源
+export function getAllowedOrigins(request?: Request): string[] {
+  const baseOrigins = [
+    '*.pages.dev', // Cloudflare Pages
+    '*.workers.dev', // Cloudflare Workers
+    'https://food-tracker-app.includeleec-b6f.workers.dev', // 明确的生产域名
+    'https://food.tinycard.xyz', // 自定义域名
+    '*.tinycard.xyz' // 允许子域名
+  ]
+
+  // 在开发环境中，动态检测端口
+  if (process.env.NODE_ENV === 'development') {
+    // 从环境变量获取配置的URL
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+      baseOrigins.push(process.env.NEXT_PUBLIC_APP_URL)
+    }
+
+    // 从请求头中动态获取主机和端口
+    if (request) {
+      try {
+        const url = new URL(request.url)
+        const host = request.headers.get('host') || url.host
+        
+        if (host) {
+          // 支持 http 和 https
+          baseOrigins.push(`http://${host}`)
+          baseOrigins.push(`https://${host}`)
+          
+          // 如果是 localhost，也支持 127.0.0.1
+          if (host.includes('localhost')) {
+            const port = host.split(':')[1]
+            if (port) {
+              baseOrigins.push(`http://127.0.0.1:${port}`)
+              baseOrigins.push(`https://127.0.0.1:${port}`)
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to parse request URL for origin detection:', error)
+      }
+    }
+
+    // 常见开发端口
+    const commonPorts = ['3000', '3001', '3002', '3003', '8000', '8080']
+    commonPorts.forEach(port => {
+      baseOrigins.push(`http://localhost:${port}`)
+      baseOrigins.push(`http://127.0.0.1:${port}`)
+    })
+  }
+
+  return [...new Set(baseOrigins)] // 去重
+}
+
 // 开发环境配置检查
 export function checkDevConfig(): void {
   if (process.env.NODE_ENV === 'development') {
