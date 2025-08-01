@@ -6,7 +6,12 @@ import { ToastProvider } from "@/components/ui/toast-provider";
 import { ConfirmationProvider } from "@/components/ui/confirmation-provider";
 import { NetworkStatus } from "@/components/ui/network-status";
 import { PWARegister } from "@/components/pwa-register";
+import { headers } from 'next/headers';
+import Script from 'next/script';
 import "./globals.css";
+
+// 强制动态渲染以生成新的 nonce
+export const dynamic = 'force-dynamic';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,11 +49,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 获取 nonce
+  const nonce = (await headers()).get('x-nonce');
+
   return (
     <html lang="zh-CN">
       <head>
@@ -68,12 +76,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Webpack nonce 配置 */}
+        {nonce && (
+          <Script 
+            strategy="afterInteractive" 
+            id="nonce-script" 
+            nonce={nonce}
+            dangerouslySetInnerHTML={{
+              __html: `__webpack_nonce__ = ${JSON.stringify(nonce)}`
+            }}
+          />
+        )}
+        
         <ErrorBoundary>
           <ToastProvider>
             <ConfirmationProvider>
               <AuthProvider>
                 <NetworkStatus />
-                <PWARegister />
+                <PWARegister nonce={nonce} />
                 {children}
               </AuthProvider>
             </ConfirmationProvider>

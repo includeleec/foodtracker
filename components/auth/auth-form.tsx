@@ -103,6 +103,7 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
               placeholder="请输入邮箱"
               required
               disabled={isLoading}
+              autoComplete="email"
               className="mt-1 h-11" // 增加高度以便移动端操作
             />
           </div>
@@ -117,6 +118,7 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
               placeholder="请输入密码"
               required
               disabled={isLoading}
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               className="mt-1 h-11"
             />
           </div>
@@ -132,6 +134,7 @@ export function AuthForm({ mode, onSuccess, onModeChange }: AuthFormProps) {
                 placeholder="请再次输入密码"
                 required
                 disabled={isLoading}
+                autoComplete="new-password"
                 className="mt-1 h-11"
               />
             </div>

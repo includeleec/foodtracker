@@ -110,6 +110,14 @@ function validateFile(file: File): void {
 async function uploadToCloudflare(file: File): Promise<CloudflareImagesResponse> {
   const config = getConfig()
   
+  console.log('Uploading to Cloudflare Images:', {
+    accountId: config.cloudflare.accountId,
+    fileName: file.name,
+    fileType: file.type,
+    fileSize: file.size,
+    hasToken: !!config.cloudflare.imagesToken
+  })
+  
   const formData = new FormData()
   formData.append('file', file)
   
@@ -124,18 +132,42 @@ async function uploadToCloudflare(file: File): Promise<CloudflareImagesResponse>
     }
   )
 
+  console.log('Cloudflare API response:', {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Object.fromEntries(response.headers.entries())
+  })
+
   if (!response.ok) {
     const errorText = await response.text()
-    console.error('Cloudflare Images API error:', errorText)
-    throw new Error(`图片上传失败: ${response.status} ${response.statusText}`)
+    console.error('Cloudflare Images API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    })
+    
+    // 提供更具体的错误信息
+    if (response.status === 401 || response.status === 403) {
+      throw new Error('Cloudflare API认证失败，请检查API Token权限')
+    } else if (response.status === 400) {
+      throw new Error(`图片上传参数错误: ${errorText}`)
+    } else {
+      throw new Error(`图片上传失败: ${response.status} ${response.statusText}`)
+    }
   }
 
   const result: CloudflareImagesResponse = await response.json()
   
   if (!result.success) {
     console.error('Cloudflare Images upload failed:', result.errors)
-    throw new Error('图片上传失败')
+    const errorMessage = result.errors?.map(e => e.message).join('; ') || '未知错误'
+    throw new Error(`图片上传失败: ${errorMessage}`)
   }
+
+  console.log('Cloudflare upload success:', {
+    id: result.result.id,
+    filename: result.result.filename
+  })
 
   return result
 }

@@ -2,7 +2,11 @@
 
 import { useEffect } from 'react'
 
-export function PWARegister() {
+interface PWARegisterProps {
+  nonce?: string | null;
+}
+
+export function PWARegister({ nonce }: PWARegisterProps) {
   useEffect(() => {
     if (
       typeof window !== 'undefined' &&
