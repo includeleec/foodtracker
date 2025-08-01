@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /auth/
+Disallow: /api/
+Disallow: /_next/
+Allow: /
+
+Sitemap: https://food.tinycard.xyz/sitemap.xml

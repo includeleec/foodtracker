@@ -242,17 +242,21 @@ export function getSecurityHeaders(): Record<string, string> {
     'X-Frame-Options': 'DENY',
     
     // HTTPS 强制
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     
     // 内容安全策略
     'Content-Security-Policy': [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'nonce-' 'strict-dynamic'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https://imagedelivery.net",
+      "img-src 'self' data: https://imagedelivery.net https://*.cloudflare.com",
       "font-src 'self'",
       "connect-src 'self' https://*.supabase.co https://api.cloudflare.com",
-      "frame-ancestors 'none'"
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+      "upgrade-insecure-requests"
     ].join('; '),
     
     // 推荐人策略
